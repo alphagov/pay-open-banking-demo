@@ -1,12 +1,18 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
+	"github.com/golang-migrate/migrate"
+	"github.com/golang-migrate/migrate/database/postgres"
+	_ "github.com/golang-migrate/migrate/source/file"
 	"github.com/google/uuid"
+	_ "github.com/lib/pq"
 )
 
 type createPaymentRequest struct {
@@ -70,6 +76,26 @@ func createPaymentHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
+	var userName = os.Getenv("PAY_OPEN_BANKING_DEMO_USERNAME")
+	var password = os.Getenv("PAY_OPEN_BANKING_DEMO_PASSWORD")
+	var hostname = os.Getenv("PAY_OPEN_BANKING_DEMO_HOSTNAME")
+	var dbName = os.Getenv("PAY_OPEN_BANKING_DEMO_DB_NAME")
+	connStr := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", userName, password, hostname, dbName)
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	driver, err := postgres.WithInstance(db, new(postgres.Config))
+	m, err := migrate.NewWithDatabaseInstance(
+		"file://db/migrations",
+		"postgres",
+		driver)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		log.Fatal(err)
+	}
 	http.HandleFunc("/v1/api/payments", createPaymentHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
