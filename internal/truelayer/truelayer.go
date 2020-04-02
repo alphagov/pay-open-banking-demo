@@ -33,6 +33,17 @@ type SinglePaymentResponse struct {
 	Status        string          `json:"status"`
 }
 
+type ProvidersResponse struct {
+	Results []Provider `json:"results"`
+}
+
+type Provider struct {
+	Logo            string `json:"logo"`
+	Icon            string `json:"icon"`
+	DisplayableName string `json:"displayable_name"`
+	MainBgColor     string `json:"main_bg_color"`
+}
+
 type PaymentResult struct {
 	SimpID                   string `json:"simp_id"`
 	AuthURI                  string `json:"auth_uri"`
@@ -103,7 +114,7 @@ func CreateSinglePayment(amount int,
 		panic(err)
 	}
 
-	var baseTrueLayerPayURL = os.Getenv("TRUELAYER_PAY_URL")
+	baseTrueLayerPayURL := os.Getenv("TRUELAYER_PAY_URL")
 	req, err := http.NewRequest("POST", baseTrueLayerPayURL+"/single-immediate-payments", bytes.NewBuffer(marshalled))
 	req.Header.Set("Authorization", "Bearer "+accessToken)
 
@@ -115,7 +126,7 @@ func CreateSinglePayment(amount int,
 	defer resp.Body.Close()
 
 	body, _ := ioutil.ReadAll(resp.Body)
-	var paymentResponse = SinglePaymentResponse{}
+	paymentResponse := SinglePaymentResponse{}
 	err = json.Unmarshal(body, &paymentResponse)
 	if err != nil {
 		panic(err)
@@ -125,7 +136,7 @@ func CreateSinglePayment(amount int,
 
 // GetSinglePaymentInfo Gets the information for a single payment by the simpID
 func GetSinglePaymentInfo(simpID string, accessToken string) SinglePaymentResponse {
-	var baseTrueLayerPayURL = os.Getenv("TRUELAYER_PAY_URL")
+	baseTrueLayerPayURL := os.Getenv("TRUELAYER_PAY_URL")
 	req, err := http.NewRequest("GET", baseTrueLayerPayURL+"/single-immediate-payments/"+simpID, nil)
 
 	req.Header.Set("Authorization", "Bearer "+accessToken)
@@ -137,7 +148,7 @@ func GetSinglePaymentInfo(simpID string, accessToken string) SinglePaymentRespon
 	defer resp.Body.Close()
 
 	body, _ := ioutil.ReadAll(resp.Body)
-	var paymentResponse = SinglePaymentResponse{}
+	paymentResponse := SinglePaymentResponse{}
 	err = json.Unmarshal(body, &paymentResponse)
 	if err != nil {
 		panic(err)
@@ -147,7 +158,7 @@ func GetSinglePaymentInfo(simpID string, accessToken string) SinglePaymentRespon
 
 // GetSinglePaymentStatuses Gets the statuses for a single simpID and returns them
 func GetSinglePaymentStatuses(simpID string, accessToken string) PaymentStatusesResponse {
-	var baseTrueLayerPayURL = os.Getenv("TRUELAYER_PAY_URL")
+	baseTrueLayerPayURL := os.Getenv("TRUELAYER_PAY_URL")
 	req, err := http.NewRequest("GET", baseTrueLayerPayURL+"/single-immediate-payments/"+simpID+"/statuses", nil)
 
 	req.Header.Set("Authorization", "Bearer "+accessToken)
@@ -159,7 +170,7 @@ func GetSinglePaymentStatuses(simpID string, accessToken string) PaymentStatuses
 	defer resp.Body.Close()
 
 	body, _ := ioutil.ReadAll(resp.Body)
-	var paymentStatuses = PaymentStatusesResponse{}
+	paymentStatuses := PaymentStatusesResponse{}
 	err = json.Unmarshal(body, &paymentStatuses)
 	if err != nil {
 		panic(err)
@@ -169,10 +180,10 @@ func GetSinglePaymentStatuses(simpID string, accessToken string) PaymentStatuses
 
 // GeneratePaymentToken Generates a token and stores it in the environment variables
 func GeneratePaymentToken() AccessTokenResponse {
-	var baseTrueLayerAuthURL = os.Getenv("TRUELAYER_AUTH_URL")
+	baseTrueLayerAuthURL := os.Getenv("TRUELAYER_AUTH_URL")
 
-	var clientID = os.Getenv("TRUELAYER_CLIENT_ID")
-	var clientSecret = os.Getenv("TRUELAYER_CLIENT_SECRET")
+	clientID := os.Getenv("TRUELAYER_CLIENT_ID")
+	clientSecret := os.Getenv("TRUELAYER_CLIENT_SECRET")
 
 	data := url.Values{}
 	data.Set("client_id", clientID)
@@ -191,11 +202,31 @@ func GeneratePaymentToken() AccessTokenResponse {
 	defer resp.Body.Close()
 
 	body, _ := ioutil.ReadAll(resp.Body)
-	var accessTokenResponse = AccessTokenResponse{}
+	accessTokenResponse := AccessTokenResponse{}
 	err = json.Unmarshal(body, &accessTokenResponse)
 	if err != nil {
 		panic(err)
 	}
 
 	return accessTokenResponse
+}
+
+func GetProviders() ProvidersResponse {
+	baseTrueLayerPayURL := os.Getenv("TRUELAYER_PAY_URL")
+
+	req, err := http.NewRequest("GET", baseTrueLayerPayURL+"/providers?capability=SingleImmediatePayment", nil)
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	providers := ProvidersResponse{}
+	err = json.Unmarshal(body, &providers)
+	if err != nil {
+		panic(err)
+	}
+	return providers
 }
