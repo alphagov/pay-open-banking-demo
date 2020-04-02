@@ -38,6 +38,7 @@ type ProvidersResponse struct {
 }
 
 type Provider struct {
+	Id              string `json:"id"`
 	Logo            string `json:"logo"`
 	Icon            string `json:"icon"`
 	DisplayableName string `json:"displayable_name"`

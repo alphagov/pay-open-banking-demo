@@ -24,6 +24,7 @@ func Routes(e *echo.Echo, db *database.DB) {
 
 	log.Print(t.templates.Name)
 
+	e.Static("/", "public")
 	e.Renderer = t
 
 	e.GET("/payment/:payment_id/select_bank", GetSelectProvidersHander(db))

@@ -1,19 +1,62 @@
 <!DOCTYPE html>
-<html>
+<html lang="en" class="govuk-template">
 
 <head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Select your bank - GOV.UK Pay</title>
+  <link rel="stylesheet" href="/stylesheets/govuk-frontend-3.6.0.min.css">
+  <link rel="shortcut icon" href="/assets/images/favicon.ico" type="image/x-icon">
 </head>
 
 <body>
-  {{range .Providers}}
-  <div>
-    <span>{{ .DisplayableName }}</span>
-    <img src="{{ .Logo }}" />
-  </div>
-  {{else}}
-  <div>No banks available</div>
-  {{end}}
+  <header class="govuk-header " role="banner" data-module="header">
+    <div class="govuk-header__container govuk-width-container">
+      <div class="govuk-header__content toolbox_header__offset">
+        <a href="/" class="govuk-header__link govuk-header__link--service-name">
+          {{ .Payment.ServiceName }}
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="govuk-main-wrapper">
+    <div class="govuk-width-container">
+
+      <form id="select-provider" name="select-provider" method="POST" action="{{ .Action }}" novalidate>
+        <div class="govuk-form-group">
+          <fieldset class="govuk-fieldset" aria-describedby="changed-name-hint">
+            <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+              <h1 class="govuk-fieldset__heading">
+                Choose your bank
+              </h1>
+            </legend>
+            <span id="changed-name-hint" class="govuk-hint">
+              Select the bank you want to pay with
+            </span>
+            <div class="govuk-radios">
+              {{range .Providers}}
+              <div class="govuk-radios__item">
+                <input class="govuk-radios__input" id="{{ .Id }}" name="changed-name" type="radio" value="{{ .Id }}">
+                <label class="govuk-label govuk-radios__label" for="{{ .Id }}">
+                  {{ .DisplayableName }}
+                </label>
+              </div>
+              {{else}}
+              <div>No banks available</div>
+              {{end}}
+            </div>
+          </fieldset>
+        </div>
+
+        <button class="govuk-button" data-module="govuk-button">
+          Continue
+        </button>
+      </form>
+    </div>
+
+    </div>
+  </main>
 </body>
 
 </html>
