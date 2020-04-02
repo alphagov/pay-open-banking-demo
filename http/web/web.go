@@ -26,5 +26,5 @@ func Routes(e *echo.Echo, db *database.DB) {
 
 	e.Renderer = t
 
-	e.GET("/payment/:payment_id", GetSelectProvidersHander(db))
+	e.GET("/payment/:payment_id/select_bank", GetSelectProvidersHander(db))
 }
