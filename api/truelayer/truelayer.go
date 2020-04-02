@@ -18,6 +18,16 @@ type AccessTokenResponse struct {
 	Scope       string `json:"scope"`
 }
 
+type PaymentStatusesResponse struct {
+	Results []PaymentStatus `json:"results"`
+	Status  string          `json:"status"`
+}
+
+type PaymentStatus struct {
+	Status string `json:"status"`
+	Date   string `json:"date"`
+}
+
 type SinglePaymentResponse struct {
 	PaymentResult []paymentResult `json:"results"`
 	Status        string          `json:"status"`
@@ -130,6 +140,26 @@ func GetSinglePaymentInfo(simpID string) SinglePaymentResponse {
 		panic(err)
 	}
 	return paymentResponse
+}
+
+func GetSinglePaymentStatuses(simpID string) PaymentStatusesResponse {
+	req, err := http.NewRequest("GET", baseTrueLayerURL+"/single-immediate-payments/"+simpID+"/statuses", nil)
+
+	req.Header.Set("Authorization", "Bearer "+os.Getenv("PAY_OPEN_BANKING_DEMO_TRUELAYER_TOKEN"))
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	var paymentStatuses = PaymentStatusesResponse{}
+	err = json.Unmarshal(body, &paymentStatuses)
+	if err != nil {
+		panic(err)
+	}
+	return paymentStatuses
 }
 
 func GeneratePaymentToken() AccessTokenResponse {
