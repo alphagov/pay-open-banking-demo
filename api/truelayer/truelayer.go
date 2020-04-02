@@ -29,11 +29,11 @@ type PaymentStatus struct {
 }
 
 type SinglePaymentResponse struct {
-	PaymentResult []paymentResult `json:"results"`
+	PaymentResult []PaymentResult `json:"results"`
 	Status        string          `json:"status"`
 }
 
-type paymentResult struct {
+type PaymentResult struct {
 	SimpID                   string `json:"simp_id"`
 	AuthURI                  string `json:"auth_uri"`
 	CreatedAt                string `json:"created_at"`
@@ -78,8 +78,7 @@ func newSinglePaymentRequest(amount int,
 	}
 }
 
-var baseTrueLayerURL = os.Getenv("PAY_OPEN_BANKING_TRUELAYER_URL")
-
+// CreateSinglePayment creates a payment in truelayer
 func CreateSinglePayment(amount int,
 	currency string,
 	beneficiaryName string,
@@ -103,7 +102,8 @@ func CreateSinglePayment(amount int,
 		panic(err)
 	}
 
-	req, err := http.NewRequest("POST", baseTrueLayerURL+"/single-immediate-payments", bytes.NewBuffer(marshalled))
+	var baseTrueLayerPayURL = os.Getenv("PAY_OPEN_BANKING_TRUELAYER_PAY_URL")
+	req, err := http.NewRequest("POST", baseTrueLayerPayURL+"/single-immediate-payments", bytes.NewBuffer(marshalled))
 	req.Header.Set("Authorization", "Bearer "+os.Getenv("PAY_OPEN_BANKING_DEMO_TRUELAYER_TOKEN"))
 
 	client := &http.Client{}
@@ -122,8 +122,10 @@ func CreateSinglePayment(amount int,
 	return paymentResponse
 }
 
+// GetSinglePaymentInfo Gets the information for a single payment by the simpID
 func GetSinglePaymentInfo(simpID string) SinglePaymentResponse {
-	req, err := http.NewRequest("GET", baseTrueLayerURL+"/single-immediate-payments/"+simpID, nil)
+	var baseTrueLayerPayURL = os.Getenv("PAY_OPEN_BANKING_TRUELAYER_PAY_URL")
+	req, err := http.NewRequest("GET", baseTrueLayerPayURL+"/single-immediate-payments/"+simpID, nil)
 
 	req.Header.Set("Authorization", "Bearer "+os.Getenv("PAY_OPEN_BANKING_DEMO_TRUELAYER_TOKEN"))
 	client := &http.Client{}
@@ -142,8 +144,10 @@ func GetSinglePaymentInfo(simpID string) SinglePaymentResponse {
 	return paymentResponse
 }
 
+// GetSinglePaymentStatuses Gets the statuses for a single simpID and returns them
 func GetSinglePaymentStatuses(simpID string) PaymentStatusesResponse {
-	req, err := http.NewRequest("GET", baseTrueLayerURL+"/single-immediate-payments/"+simpID+"/statuses", nil)
+	var baseTrueLayerPayURL = os.Getenv("PAY_OPEN_BANKING_TRUELAYER_PAY_URL")
+	req, err := http.NewRequest("GET", baseTrueLayerPayURL+"/single-immediate-payments/"+simpID+"/statuses", nil)
 
 	req.Header.Set("Authorization", "Bearer "+os.Getenv("PAY_OPEN_BANKING_DEMO_TRUELAYER_TOKEN"))
 	client := &http.Client{}
@@ -162,7 +166,10 @@ func GetSinglePaymentStatuses(simpID string) PaymentStatusesResponse {
 	return paymentStatuses
 }
 
+// GeneratePaymentToken Generates a token and stores it in the environment variables
 func GeneratePaymentToken() AccessTokenResponse {
+	var baseTrueLayerAuthURL = os.Getenv("PAY_OPEN_BANKING_TRUELAYER_AUTH_URL")
+
 	var clientID = os.Getenv("PAY_OPEN_BANKING_DEMO_CLIENT_ID")
 	var clientSecret = os.Getenv("PAY_OPEN_BANKING_DEMO_CLIENT_SECRET")
 	var scope = os.Getenv("PAY_OPEN_BANKING_DEMO_SCOPE")
@@ -174,7 +181,7 @@ func GeneratePaymentToken() AccessTokenResponse {
 	data.Set("scope", scope)
 	data.Set("grant_type", grantType)
 
-	req, err := http.NewRequest("POST", baseTrueLayerURL+"/connect/token/", strings.NewReader(data.Encode()))
+	req, err := http.NewRequest("POST", baseTrueLayerAuthURL+"/connect/token", strings.NewReader(data.Encode()))
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 	client := &http.Client{}

@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"pay-open-banking-demo/api/truelayer"
 
 	"github.com/golang-migrate/migrate"
 	"github.com/golang-migrate/migrate/database/postgres"
@@ -96,6 +97,7 @@ func main() {
 	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 		log.Fatal(err)
 	}
+	var token = truelayer.GeneratePaymentToken()
 	http.HandleFunc("/v1/api/payments", createPaymentHandler)
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
