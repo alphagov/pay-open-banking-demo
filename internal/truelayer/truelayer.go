@@ -86,7 +86,8 @@ func CreateSinglePayment(amount int,
 	beneficiarySortCode string,
 	beneficiaryAccountNumber string,
 	beneficiaryRemitterReference string,
-	redirectURL string) SinglePaymentResponse {
+	redirectURL string,
+	accessToken string) SinglePaymentResponse {
 
 	var jsonBody = newSinglePaymentRequest(amount,
 		currency,
@@ -102,9 +103,9 @@ func CreateSinglePayment(amount int,
 		panic(err)
 	}
 
-	var baseTrueLayerPayURL = os.Getenv("PAY_OPEN_BANKING_TRUELAYER_PAY_URL")
+	var baseTrueLayerPayURL = os.Getenv("TRUELAYER_PAY_URL")
 	req, err := http.NewRequest("POST", baseTrueLayerPayURL+"/single-immediate-payments", bytes.NewBuffer(marshalled))
-	req.Header.Set("Authorization", "Bearer "+os.Getenv("PAY_OPEN_BANKING_DEMO_TRUELAYER_TOKEN"))
+	req.Header.Set("Authorization", "Bearer "+accessToken)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -123,11 +124,11 @@ func CreateSinglePayment(amount int,
 }
 
 // GetSinglePaymentInfo Gets the information for a single payment by the simpID
-func GetSinglePaymentInfo(simpID string) SinglePaymentResponse {
-	var baseTrueLayerPayURL = os.Getenv("PAY_OPEN_BANKING_TRUELAYER_PAY_URL")
+func GetSinglePaymentInfo(simpID string, accessToken string) SinglePaymentResponse {
+	var baseTrueLayerPayURL = os.Getenv("TRUELAYER_PAY_URL")
 	req, err := http.NewRequest("GET", baseTrueLayerPayURL+"/single-immediate-payments/"+simpID, nil)
 
-	req.Header.Set("Authorization", "Bearer "+os.Getenv("PAY_OPEN_BANKING_DEMO_TRUELAYER_TOKEN"))
+	req.Header.Set("Authorization", "Bearer "+accessToken)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -145,11 +146,11 @@ func GetSinglePaymentInfo(simpID string) SinglePaymentResponse {
 }
 
 // GetSinglePaymentStatuses Gets the statuses for a single simpID and returns them
-func GetSinglePaymentStatuses(simpID string) PaymentStatusesResponse {
-	var baseTrueLayerPayURL = os.Getenv("PAY_OPEN_BANKING_TRUELAYER_PAY_URL")
+func GetSinglePaymentStatuses(simpID string, accessToken string) PaymentStatusesResponse {
+	var baseTrueLayerPayURL = os.Getenv("TRUELAYER_PAY_URL")
 	req, err := http.NewRequest("GET", baseTrueLayerPayURL+"/single-immediate-payments/"+simpID+"/statuses", nil)
 
-	req.Header.Set("Authorization", "Bearer "+os.Getenv("PAY_OPEN_BANKING_DEMO_TRUELAYER_TOKEN"))
+	req.Header.Set("Authorization", "Bearer "+accessToken)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -168,18 +169,16 @@ func GetSinglePaymentStatuses(simpID string) PaymentStatusesResponse {
 
 // GeneratePaymentToken Generates a token and stores it in the environment variables
 func GeneratePaymentToken() AccessTokenResponse {
-	var baseTrueLayerAuthURL = os.Getenv("PAY_OPEN_BANKING_TRUELAYER_AUTH_URL")
+	var baseTrueLayerAuthURL = os.Getenv("TRUELAYER_AUTH_URL")
 
-	var clientID = os.Getenv("PAY_OPEN_BANKING_DEMO_CLIENT_ID")
-	var clientSecret = os.Getenv("PAY_OPEN_BANKING_DEMO_CLIENT_SECRET")
-	var scope = os.Getenv("PAY_OPEN_BANKING_DEMO_SCOPE")
-	var grantType = os.Getenv("PAY_OPEN_BANKING_DEMO_GRANT_TYPE")
+	var clientID = os.Getenv("TRUELAYER_CLIENT_ID")
+	var clientSecret = os.Getenv("TRUELAYER_CLIENT_SECRET")
 
 	data := url.Values{}
 	data.Set("client_id", clientID)
 	data.Set("client_secret", clientSecret)
-	data.Set("scope", scope)
-	data.Set("grant_type", grantType)
+	data.Set("scope", "payments")
+	data.Set("grant_type", "client_credentials")
 
 	req, err := http.NewRequest("POST", baseTrueLayerAuthURL+"/connect/token", strings.NewReader(data.Encode()))
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
@@ -197,6 +196,6 @@ func GeneratePaymentToken() AccessTokenResponse {
 	if err != nil {
 		panic(err)
 	}
-	os.Setenv("PAY_OPEN_BANKING_DEMO_TRUELAYER_TOKEN", accessTokenResponse.AccessToken)
+
 	return accessTokenResponse
 }
