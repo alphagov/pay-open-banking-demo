@@ -5,8 +5,8 @@ import (
 	"log"
 	"os"
 
-	"github.com/stephencdaly/stephens-openbanking-test/database"
-	"github.com/stephencdaly/stephens-openbanking-test/http"
+	"github.com/alphagov/pay-open-banking-demo/database"
+	"github.com/alphagov/pay-open-banking-demo/http"
 )
 
 func Main() error {

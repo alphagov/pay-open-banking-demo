@@ -85,3 +85,12 @@ func (db *DB) InsertCharge(charge Charge) error {
 
 	return err
 }
+
+func (db *DB) GetCharge(paymentId string) (Charge, error) {
+	charge := Charge{}
+	err := db.conn.QueryRow(`SELECT external_id, amount, reference, description, return_url, status
+		FROM CHARGES WHERE external_id = $1`, paymentId).Scan(&charge.ExternalId, &charge.Amount,
+		&charge.Reference, &charge.Description, &charge.ReturnUrl, &charge.Status)
+
+	return charge, err
+}
