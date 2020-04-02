@@ -5,8 +5,18 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
+	"strconv"
+	"strings"
 )
+
+type AccessTokenResponse struct {
+	AccessToken string `json:"access_token"`
+	ExpiresIn   int    `json:"expires_in"`
+	TokenType   string `json:"token_type"`
+	Scope       string `json:"scope"`
+}
 
 type SinglePaymentResponse struct {
 	PaymentResult []paymentResult `json:"results"`
@@ -120,4 +130,36 @@ func GetSinglePaymentInfo(simpID string) SinglePaymentResponse {
 		panic(err)
 	}
 	return paymentResponse
+}
+
+func GeneratePaymentToken() AccessTokenResponse {
+	var clientID = os.Getenv("PAY_OPEN_BANKING_DEMO_CLIENT_ID")
+	var clientSecret = os.Getenv("PAY_OPEN_BANKING_DEMO_CLIENT_SECRET")
+	var scope = os.Getenv("PAY_OPEN_BANKING_DEMO_SCOPE")
+	var grantType = os.Getenv("PAY_OPEN_BANKING_DEMO_GRANT_TYPE")
+
+	data := url.Values{}
+	data.Set("client_id", clientID)
+	data.Set("client_secret", clientSecret)
+	data.Set("scope", scope)
+	data.Set("grant_type", grantType)
+
+	req, err := http.NewRequest("POST", baseTrueLayerURL+"/connect/token/", strings.NewReader(data.Encode()))
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	var accessTokenResponse = AccessTokenResponse{}
+	err = json.Unmarshal(body, &accessTokenResponse)
+	if err != nil {
+		panic(err)
+	}
+	os.Setenv("PAY_OPEN_BANKING_DEMO_TRUELAYER_TOKEN", accessTokenResponse.AccessToken)
+	return accessTokenResponse
 }
