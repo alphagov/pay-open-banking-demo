@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Select your bank - GOV.UK Pay</title>
+</head>
+
+<body>
+  {{range .Providers}}
+  <div>
+    <span>{{ .DisplayableName }}</span>
+    <img src="{{ .Logo }}" />
+  </div>
+  {{else}}
+  <div>No banks available</div>
+  {{end}}
+</body>
+
+</html>
