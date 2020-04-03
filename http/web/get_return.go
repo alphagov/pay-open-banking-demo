@@ -36,12 +36,7 @@ func GetReturnHandler(db *database.DB, truelayerAccessToken string) echo.Handler
 			paymentResult.Status != "cancelled"
 
 		if success {
-			payment := PaymentData{
-				ServiceName: "Pay your car tax",
-				Description: charge.Description,
-				Amount:      charge.Amount,
-				Reference:   charge.Reference,
-			}
+			payment := NewPaymentData(charge)
 			data := ReturnData{
 				Payment: payment,
 			}

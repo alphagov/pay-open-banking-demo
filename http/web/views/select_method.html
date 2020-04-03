@@ -2,48 +2,64 @@
 <html lang="en" class="govuk-template">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {{ template "head.html" }}
   <title>Select payment method - GOV.UK Pay</title>
-  <link rel="stylesheet" href="/stylesheets/govuk-frontend-3.6.0.min.css">
-  <link rel="shortcut icon" href="/assets/images/favicon.ico" type="image/x-icon">
 </head>
 
-<body>
+<body class="govuk-template__body">
   {{ template "header.html" . }}
 
   <main class="govuk-main-wrapper">
     <div class="govuk-width-container">
 
-      <div class="govuk-form-group">
-        <fieldset class="govuk-fieldset">
-          <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
-            <h1 class="govuk-fieldset__heading">
-              Select how you want to pay
-            </h1>
-          </legend>
-          <div class="govuk-radios">
-            <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="bank-single-payment" name="select-method" type="radio"
-                value="bank-single-payment">
-              <label class="govuk-label govuk-radios__label" for="bank-single-payment">
-                Pay with your bank
-              </label>
-            </div>
-            <div class="govuk-radios__item">
-              <input class="govuk-radios__input" id="card" name="select-method" type="radio" value="card">
-              <label class="govuk-label govuk-radios__label" for="card">
-                Credit/Debit card
-              </label>
-            </div>
+      <div class="govuk-grid-row govuk-!-margin-bottom-9">
+        <div class="govuk-grid-column-two-thirds ">
+          <div class="govuk-form-group">
+            <fieldset class="govuk-fieldset">
+              <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+                <h1 class="govuk-fieldset__heading">
+                  Select how you want to pay
+                </h1>
+              </legend>
+              <div class="govuk-radios">
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="bank-single-payment" name="select-method" type="radio"
+                    value="bank-single-payment">
+                  <label class="govuk-label govuk-radios__label" for="bank-single-payment">
+                    Pay with your bank
+                  </label>
+                </div>
+                <div class="govuk-radios__item">
+                  <input class="govuk-radios__input" id="card" name="select-method" type="radio" value="card">
+                  <label class="govuk-label govuk-radios__label" for="card">
+                    Credit/Debit card
+                  </label>
+                </div>
+              </div>
+            </fieldset>
           </div>
-        </fieldset>
+
+          <a class="govuk-button" data-module="govuk-button" href="{{ .Action }}">
+            Continue
+          </a>
+        </div>
+
+        <div class="govuk-grid-column-one-third payment-summary-wrap">
+          <aside class="payment-summary">
+            <h2 class="govuk-heading-m">Payment summary</h2>
+            <p id="payment-description" class="govuk-body">
+              {{ .Payment.Description }}
+            </p>
+            <p class="govuk-body govuk-!-margin-bottom-0">
+              Total amount:
+              <span id="amount" class="amount govuk-!-font-size-36 govuk-!-font-weight-bold">
+                £{{ .Payment.AmountInPence }}
+              </span>
+            </p>
+          </aside>
+        </div>
+
       </div>
-
-      <a class="govuk-button" data-module="govuk-button" href="{{ .Action }}">
-        Continue
-      </a>
-
     </div>
   </main>
 </body>

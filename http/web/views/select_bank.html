@@ -2,50 +2,65 @@
 <html lang="en" class="govuk-template">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Select your bank - GOV.UK Pay</title>
-  <link rel="stylesheet" href="/stylesheets/govuk-frontend-3.6.0.min.css">
-  <link rel="shortcut icon" href="/assets/images/favicon.ico" type="image/x-icon">
+  {{ template "head.html" }}
+  <title>Pick your bank - GOV.UK Pay</title>
 </head>
 
-<body>
+<body class="govuk-template__body">
   {{ template "header.html" . }}
 
   <main class="govuk-main-wrapper">
     <div class="govuk-width-container">
+      <div class="govuk-grid-row govuk-!-margin-bottom-9">
+        <div class="govuk-grid-column-two-thirds ">
 
-      <form id="select-bank" name="select-bank" method="POST" action="{{ .Action }}" novalidate>
-        <div class="govuk-form-group">
-          <fieldset class="govuk-fieldset" aria-describedby="select-bank-hint">
-            <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
-              <h1 class="govuk-fieldset__heading">
-                Pick your bank
-              </h1>
-            </legend>
-            <span id="select-bank-hint" class="govuk-hint">
-              You will be transferred to login to your online banking to complete the payment.
-            </span>
-            <div class="govuk-radios">
-              {{range .Providers}}
-              <div class="govuk-radios__item">
-                <input class="govuk-radios__input" id="{{ .ID }}" name="select-bank" type="radio" value="{{ .ID }}">
-                <label class="govuk-label govuk-radios__label" for="{{ .ID }}">
-                  {{ .DisplayableName }}
-                </label>
-              </div>
-              {{else}}
-              <div>No banks available</div>
-              {{end}}
+          <form id="select-bank" name="select-bank" method="POST" action="{{ .Action }}" novalidate>
+            <div class="govuk-form-group">
+              <fieldset class="govuk-fieldset" aria-describedby="select-bank-hint">
+                <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
+                  <h1 class="govuk-fieldset__heading">
+                    Pick your bank
+                  </h1>
+                </legend>
+                <span id="select-bank-hint" class="govuk-hint">
+                  You will be transferred to login to your online banking to complete the payment.
+                </span>
+                <div class="govuk-radios">
+                  {{range .Providers}}
+                  <div class="govuk-radios__item">
+                    <input class="govuk-radios__input" id="{{ .ID }}" name="select-bank" type="radio" value="{{ .ID }}">
+                    <label class="govuk-label govuk-radios__label" for="{{ .ID }}">
+                      {{ .DisplayableName }}
+                    </label>
+                  </div>
+                  {{else}}
+                  <div>No banks available</div>
+                  {{end}}
+                </div>
+              </fieldset>
             </div>
-          </fieldset>
+
+            <button class="govuk-button" data-module="govuk-button">
+              Continue
+            </button>
+          </form>
         </div>
 
-        <button class="govuk-button" data-module="govuk-button">
-          Continue
-        </button>
-      </form>
-    </div>
+        <div class="govuk-grid-column-one-third payment-summary-wrap">
+          <aside class="payment-summary">
+            <h2 class="govuk-heading-m">Payment summary</h2>
+            <p id="payment-description" class="govuk-body">
+              {{ .Payment.Description }}
+            </p>
+            <p class="govuk-body govuk-!-margin-bottom-0">
+              Total amount:
+              <span id="amount" class="amount govuk-!-font-size-36 govuk-!-font-weight-bold">
+                £{{ .Payment.AmountInPence }}
+              </span>
+            </p>
+          </aside>
+        </div>
+      </div>
 
     </div>
   </main>

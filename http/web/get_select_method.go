@@ -11,7 +11,7 @@ import (
 
 type SelectMethodData struct {
 	Payment PaymentData
-	Action string
+	Action  string
 }
 
 func GetSelectMethodHandler(db *database.DB) echo.HandlerFunc {
@@ -22,11 +22,7 @@ func GetSelectMethodHandler(db *database.DB) echo.HandlerFunc {
 			return err
 		}
 
-		payment := PaymentData{
-			ServiceName: "Pay your car tax",
-			Description: charge.Description,
-			Amount:      charge.Amount,
-		}
+		payment := NewPaymentData(charge)
 		data := SelectProviderData{
 			Providers: providers,
 			Payment:   payment,
