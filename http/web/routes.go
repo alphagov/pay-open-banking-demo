@@ -3,7 +3,6 @@ package web
 import (
 	"html/template"
 	"io"
-	"log"
 
 	"github.com/alphagov/pay-open-banking-demo/database"
 	"github.com/labstack/echo/v4"
@@ -22,10 +21,9 @@ func Routes(e *echo.Echo, db *database.DB) {
 		templates: template.Must(template.ParseGlob("http/web/views/*.html")),
 	}
 
-	log.Print(t.templates.Name)
-
 	e.Static("/", "public")
 	e.Renderer = t
 
+	e.GET("/payment/:payment_id/select_method", GetSelectMethodHandler(db))
 	e.GET("/payment/:payment_id/select_bank", GetSelectProvidersHander(db))
 }
