@@ -1,6 +1,7 @@
 package web
 
 import (
+	"log"
 	"net/http"
 	"os"
 
@@ -16,6 +17,9 @@ func PostSelectBankHandler(db *database.DB, truelayerAccessToken string) echo.Ha
 			return err
 		}
 
+		redirectURL := os.Getenv("APPLICATION_URL") + "return"
+		log.Print("Redirect URL to send to TrueLayer " + redirectURL)
+
 		request := truelayer.SinglePaymentRequest{
 			Amount:                       charge.Amount,
 			Currency:                     "GBP",
@@ -24,7 +28,7 @@ func PostSelectBankHandler(db *database.DB, truelayerAccessToken string) echo.Ha
 			BeneficiarySortCode:          "234567",
 			BeneficiaryAccountNumber:     "23456789",
 			BeneficiaryRemitterReference: "GOV.UK PAY DEMO",
-			RedirectURL:                  os.Getenv("APPLICATION_URL") + "/return/",
+			RedirectURL:                  redirectURL,
 			RemitterProviderID:           c.FormValue("select-bank"),
 			DirectBankLink:               true,
 		}

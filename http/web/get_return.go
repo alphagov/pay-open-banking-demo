@@ -1,6 +1,7 @@
 package web
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/alphagov/pay-open-banking-demo/database"
@@ -14,7 +15,8 @@ type ReturnData struct {
 
 func GetReturnHandler(db *database.DB, truelayerAccessToken string) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		providerID := c.Param("payment_id")
+		providerID := c.QueryParam("payment_id")
+		log.Print("Getting payment by provider id: " + providerID)
 		charge, err := db.GetChargeByProviderId(providerID)
 		if err != nil {
 			return err
@@ -26,6 +28,7 @@ func GetReturnHandler(db *database.DB, truelayerAccessToken string) echo.Handler
 		}
 
 		paymentResult := response.PaymentResult[0]
+		log.Printf("Updating charge %s status to %s", charge.ExternalID, paymentResult.Status)
 		db.UpdateChargeStatus(charge.ExternalID, paymentResult.Status)
 
 		success := paymentResult.Status != "failed" &&

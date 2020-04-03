@@ -114,13 +114,11 @@ func CreateSinglePayment(request SinglePaymentRequest, accessToken string) (Sing
 		return paymentResponse, err
 	}
 
-	log.Print("About to unmarshal")
 	body, _ := ioutil.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &paymentResponse)
 	if err != nil {
 		return paymentResponse, err
 	}
-	log.Print("Didn't error")
 	return paymentResponse, err
 }
 
