@@ -31,18 +31,17 @@ func GetReturnHandler(db *database.DB, truelayerAccessToken string) echo.Handler
 		log.Printf("Updating charge %s status to %s", charge.ExternalID, paymentResult.Status)
 		db.UpdateChargeStatus(charge.ExternalID, paymentResult.Status)
 
-		success := paymentResult.Status != "failed" &&
-			paymentResult.Status != "rejected" &&
-			paymentResult.Status != "cancelled"
-
-		if success {
-			payment := NewPaymentData(charge)
-			data := ReturnData{
-				Payment: payment,
-			}
-			return c.Render(http.StatusOK, "success.html", data)
+		payment := NewPaymentData(charge)
+		data := ReturnData{
+			Payment: payment,
 		}
 
-		return c.Render(http.StatusOK, "failed.html", nil)
+		if paymentResult.Status == "failed" || paymentResult.Status == "rejected" {
+			return c.Render(http.StatusOK, "failed.html", data)
+		}
+		if paymentResult.Status == "cancelled" {
+			return c.Render(http.StatusOK, "cancelled.html", data)
+		}
+		return c.Render(http.StatusOK, "success.html", data)
 	}
 }

@@ -29,7 +29,7 @@ func CreatePaymentHandler(db *database.DB) echo.HandlerFunc {
 			Reference:   request.Reference,
 			Description: request.Description,
 			Amount:      request.Amount,
-			ReturnUrl:   request.ReturnURL,
+			ReturnURL:   request.ReturnURL,
 			ExternalID:  paymentId,
 			Status:      "created",
 		}

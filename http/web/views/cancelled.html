@@ -3,7 +3,7 @@
 
 <head>
   {{ template "head.html" }}
-  <title>Payment failed - GOV.UK Pay</title>
+  <title>Payment cancelled - GOV.UK Pay</title>
 </head>
 
 <body class="govuk-template__body">
@@ -11,8 +11,8 @@
 
   <main class="govuk-main-wrapper">
     <div class="govuk-width-container">
-      <h1 class="govuk-heading-l">Your payment was unsuccessful</h1>
-      <p class="govuk-body-l">No money has been taken from your account. Contact your bank for more details.</p>
+      <h1 class="govuk-heading-l">Your payment has been cancelled</h1>
+      <p class="govuk-body-l">No money has been taken from your account.</p>
 
       <a id="return-url" role="button" class="govuk-button" href="{{ .Payment.ReturnURL }}">Continue</a>
     </div>

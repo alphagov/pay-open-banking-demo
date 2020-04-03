@@ -11,6 +11,7 @@ type PaymentData struct {
 	Description   string
 	AmountInPence string
 	Reference     string
+	ReturnURL     string
 }
 
 func NewPaymentData(charge database.Charge) PaymentData {
@@ -19,5 +20,6 @@ func NewPaymentData(charge database.Charge) PaymentData {
 		Description:   charge.Description,
 		AmountInPence: fmt.Sprintf("%.2f", float32(charge.Amount)/100.0),
 		Reference:     charge.Reference,
+		ReturnURL: charge.ReturnURL,
 	}
 }
