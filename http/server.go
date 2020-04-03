@@ -21,7 +21,10 @@ func Start(config Config) {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	truelayerToken := truelayer.GeneratePaymentToken()
+	truelayerToken, err := truelayer.GeneratePaymentToken()
+	if err != nil {
+		panic(e)
+	}
 	log.Printf("Got TrueLayer token, expires in %d", truelayerToken.ExpiresIn)
 
 	e.POST("/v1/api/payments", api.CreatePaymentHandler(config.DB))

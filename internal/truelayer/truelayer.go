@@ -125,51 +125,58 @@ func CreateSinglePayment(request SinglePaymentRequest, accessToken string) (Sing
 }
 
 // GetSinglePaymentInfo Gets the information for a single payment by the simpID
-func GetSinglePaymentInfo(simpID string, accessToken string) SinglePaymentResponse {
+func GetSinglePaymentInfo(simpID string, accessToken string) (SinglePaymentResponse, error) {
 	baseTrueLayerPayURL := os.Getenv("TRUELAYER_PAY_URL")
+	paymentResponse := SinglePaymentResponse{}
 	req, err := http.NewRequest("GET", baseTrueLayerPayURL+"/single-immediate-payments/"+simpID, nil)
+	if err != nil {
+		return paymentResponse, err
+	}
 
 	req.Header.Set("Authorization", "Bearer "+accessToken)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		return paymentResponse, err
 	}
 	defer resp.Body.Close()
 
 	body, _ := ioutil.ReadAll(resp.Body)
-	paymentResponse := SinglePaymentResponse{}
 	err = json.Unmarshal(body, &paymentResponse)
 	if err != nil {
-		panic(err)
+		return paymentResponse, err
 	}
-	return paymentResponse
+	return paymentResponse, err
 }
 
 // GetSinglePaymentStatuses Gets the statuses for a single simpID and returns them
-func GetSinglePaymentStatuses(simpID string, accessToken string) PaymentStatusesResponse {
+func GetSinglePaymentStatuses(simpID string, accessToken string) (PaymentStatusesResponse, error) {
 	baseTrueLayerPayURL := os.Getenv("TRUELAYER_PAY_URL")
+	paymentStatuses := PaymentStatusesResponse{}
+
 	req, err := http.NewRequest("GET", baseTrueLayerPayURL+"/single-immediate-payments/"+simpID+"/statuses", nil)
+	if err != nil {
+		return paymentStatuses, err
+	}
 
 	req.Header.Set("Authorization", "Bearer "+accessToken)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		return paymentStatuses, err
 	}
 	defer resp.Body.Close()
 
 	body, _ := ioutil.ReadAll(resp.Body)
-	paymentStatuses := PaymentStatusesResponse{}
 	err = json.Unmarshal(body, &paymentStatuses)
 	if err != nil {
-		panic(err)
+		return paymentStatuses, err
 	}
-	return paymentStatuses
+	return paymentStatuses, err
 }
 
 // GeneratePaymentToken Generates a token and stores it in the environment variables
-func GeneratePaymentToken() AccessTokenResponse {
+func GeneratePaymentToken() (AccessTokenResponse, error) {
 	baseTrueLayerAuthURL := os.Getenv("TRUELAYER_AUTH_URL")
 
 	clientID := os.Getenv("TRUELAYER_CLIENT_ID")
@@ -181,24 +188,29 @@ func GeneratePaymentToken() AccessTokenResponse {
 	data.Set("scope", "payments")
 	data.Set("grant_type", "client_credentials")
 
+	accessTokenResponse := AccessTokenResponse{}
+
 	req, err := http.NewRequest("POST", baseTrueLayerAuthURL+"/connect/token", strings.NewReader(data.Encode()))
+	if err != nil {
+		return accessTokenResponse, err
+	}
+
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 	req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		return accessTokenResponse, err
 	}
 	defer resp.Body.Close()
 
 	body, _ := ioutil.ReadAll(resp.Body)
-	accessTokenResponse := AccessTokenResponse{}
 	err = json.Unmarshal(body, &accessTokenResponse)
 	if err != nil {
-		panic(err)
+		return accessTokenResponse, err
 	}
 
-	return accessTokenResponse
+	return accessTokenResponse, err
 }
 
 // GetProviders requests a list of providers from TrueLayer that can currently proccess a SingleImmediatePayment

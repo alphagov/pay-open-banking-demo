@@ -27,4 +27,5 @@ func Routes(e *echo.Echo, db *database.DB, truelayerAccessToken string) {
 	e.GET("/payment/:payment_id/select_method", GetSelectMethodHandler(db))
 	e.GET("/payment/:payment_id/select_bank", GetSelectBankHander(db))
 	e.POST("/payment/:payment_id/select_bank", PostSelectBankHandler(db, truelayerAccessToken))
+	e.GET("/return", GetReturnHandler(db, truelayerAccessToken))
 }

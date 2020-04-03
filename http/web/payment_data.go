@@ -4,4 +4,5 @@ type PaymentData struct {
 	ServiceName string
 	Description string
 	Amount      int
+	Reference   string
 }
