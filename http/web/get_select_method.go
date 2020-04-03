@@ -22,10 +22,9 @@ func GetSelectMethodHandler(db *database.DB) echo.HandlerFunc {
 			return err
 		}
 
-		payment := NewPaymentData(charge)
 		data := SelectProviderData{
 			Providers: providers,
-			Payment:   payment,
+			Payment:   NewPaymentData(charge),
 			Action:    fmt.Sprintf("/payment/%s/select_bank", charge.ExternalID),
 		}
 		return c.Render(http.StatusOK, "select_method.html", data)

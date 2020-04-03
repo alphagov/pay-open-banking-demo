@@ -30,10 +30,9 @@ func GetReturnHandler(db *database.DB, truelayerAccessToken string) echo.Handler
 		paymentResult := response.PaymentResult[0]
 		log.Printf("Updating charge %s status to %s", charge.ExternalID, paymentResult.Status)
 		db.UpdateChargeStatus(charge.ExternalID, paymentResult.Status)
-
-		payment := NewPaymentData(charge)
+ 
 		data := ReturnData{
-			Payment: payment,
+			Payment: NewPaymentData(charge),
 		}
 
 		if paymentResult.Status == "failed" || paymentResult.Status == "rejected" {
