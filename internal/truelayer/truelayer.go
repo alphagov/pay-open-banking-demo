@@ -11,6 +11,7 @@ import (
 	"strings"
 )
 
+// AccessTokenResponse is the response we receive from TrueLayer when we request an access token
 type AccessTokenResponse struct {
 	AccessToken string `json:"access_token"`
 	ExpiresIn   int    `json:"expires_in"`
@@ -18,33 +19,39 @@ type AccessTokenResponse struct {
 	Scope       string `json:"scope"`
 }
 
+// PaymentStatusesResponse is the wrapper object TrueLayer send to use when we request payment statuses
 type PaymentStatusesResponse struct {
 	Results []PaymentStatus `json:"results"`
 	Status  string          `json:"status"`
 }
 
+// PaymentStatus is the object we receive from TrueLayer when we request payment statuses
 type PaymentStatus struct {
 	Status string `json:"status"`
 	Date   string `json:"date"`
 }
 
+// SinglePaymentResponse is a wrapper for the results we receive when we receive information about a payment
 type SinglePaymentResponse struct {
 	PaymentResult []PaymentResult `json:"results"`
 	Status        string          `json:"status"`
 }
 
+// ProvidersResponse is the wrapper object we receive from TrueLayer to list banks that are currently available
 type ProvidersResponse struct {
 	Results []Provider `json:"results"`
 }
 
+// Provider is the representation of a bank we receive from TrueLayer
 type Provider struct {
-	Id              string `json:"id"`
+	ID              string `json:"id"`
 	Logo            string `json:"logo"`
 	Icon            string `json:"icon"`
 	DisplayableName string `json:"displayable_name"`
 	MainBgColor     string `json:"main_bg_color"`
 }
 
+// PaymentResult is the representation of a payment we receive from TrueLayer
 type PaymentResult struct {
 	SimpID                   string `json:"simp_id"`
 	AuthURI                  string `json:"auth_uri"`
@@ -212,6 +219,7 @@ func GeneratePaymentToken() AccessTokenResponse {
 	return accessTokenResponse
 }
 
+// GetProviders requests a list of providers from TrueLayer that can currently proccess a SingleImmediatePayment
 func GetProviders() ProvidersResponse {
 	baseTrueLayerPayURL := os.Getenv("TRUELAYER_PAY_URL")
 
