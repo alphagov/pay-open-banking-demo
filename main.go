@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 
@@ -10,11 +9,7 @@ import (
 )
 
 func Main() error {
-	var userName = os.Getenv("DB_USERNAME")
-	var password = os.Getenv("DB_PASSWORD")
-	var hostname = os.Getenv("DB_HOSTNAME")
-	var dbName = os.Getenv("DB_NAME")
-	connStr := fmt.Sprintf("postgres://%s:%s@%s/%s?sslmode=disable", userName, password, hostname, dbName)
+	connStr := os.Getenv("DATABASE_URL")
 	db, err := database.NewDB(connStr)
 	if err != nil {
 		return err
