@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"encoding/json"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"strconv"
 	"strings"
+	"errors"
 )
 
 // AccessTokenResponse is the response we receive from TrueLayer when we request an access token
@@ -88,6 +90,7 @@ func CreateSinglePayment(request SinglePaymentRequest, accessToken string) (Sing
 	baseTrueLayerPayURL := os.Getenv("TRUELAYER_PAY_URL")
 	req, err := http.NewRequest("POST", baseTrueLayerPayURL+"/single-immediate-payments", bytes.NewBuffer(marshalled))
 	req.Header.Set("Authorization", "Bearer "+accessToken)
+	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -96,11 +99,26 @@ func CreateSinglePayment(request SinglePaymentRequest, accessToken string) (Sing
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode != 200 {
+		var data map[string]interface{}
+		body, _ := ioutil.ReadAll(resp.Body)
+		err := json.Unmarshal(body, &data)
+		if err != nil {
+			return paymentResponse, err
+		}
+		log.Printf("TrueLayer returned status code: %d", resp.StatusCode)
+		log.Print(data)
+		err = errors.New("Failed to create payment with TrueLayer")
+		return paymentResponse, err
+	}
+
+	log.Print("About to unmarshal")
 	body, _ := ioutil.ReadAll(resp.Body)
 	err = json.Unmarshal(body, &paymentResponse)
 	if err != nil {
 		return paymentResponse, err
 	}
+	log.Print("Didn't error")
 	return paymentResponse, err
 }
 

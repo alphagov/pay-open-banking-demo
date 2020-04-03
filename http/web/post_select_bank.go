@@ -19,10 +19,11 @@ func PostSelectBankHandler(db *database.DB, truelayerAccessToken string) echo.Ha
 			Amount:                       charge.Amount,
 			Currency:                     "GBP",
 			BeneficiaryName:              "GOV.UK Pay",
+			BeneficiaryReference:         "GOV.UK PAY DEMO",
 			BeneficiarySortCode:          "234567",
 			BeneficiaryAccountNumber:     "23456789",
 			BeneficiaryRemitterReference: "GOV.UK PAY DEMO",
-			RedirectURL:                  "https://www.payments.service.gov.uk/",
+			RedirectURL:                  "https://console.truelayer-sandbox.com/redirect-page",
 		}
 
 		response, err := truelayer.CreateSinglePayment(request, truelayerAccessToken)
