@@ -24,14 +24,14 @@ func PostSelectBankHandler(db *database.DB, truelayerAccessToken string) echo.Ha
 			BeneficiaryAccountNumber:     "23456789",
 			BeneficiaryRemitterReference: "GOV.UK PAY DEMO",
 			RedirectURL:                  "https://console.truelayer-sandbox.com/redirect-page",
+			RemitterProviderID:           c.FormValue("select-bank"),
+			DirectBankLink:               true,
 		}
 
 		response, err := truelayer.CreateSinglePayment(request, truelayerAccessToken)
 		if err != nil {
 			return err
 		}
-
-		return c.JSON(http.StatusOK, response)
-		// return c.Redirect(http.StatusSeeOther, truelayerRes.PaymentResult[0].RedirectURI)
+		return c.Redirect(http.StatusSeeOther, response.PaymentResult[0].AuthURI)
 	}
 }

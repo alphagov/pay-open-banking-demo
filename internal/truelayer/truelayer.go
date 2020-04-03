@@ -3,6 +3,7 @@ package truelayer
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -10,7 +11,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"errors"
 )
 
 // AccessTokenResponse is the response we receive from TrueLayer when we request an access token
@@ -77,6 +77,8 @@ type SinglePaymentRequest struct {
 	BeneficiaryAccountNumber     string `json:"beneficiary_account_number"`
 	BeneficiaryRemitterReference string `json:"remitter_reference"`
 	RedirectURL                  string `json:"redirect_uri"`
+	RemitterProviderID           string `json:"remitter_provider_id"`
+	DirectBankLink               bool   `json:"direct_bank_link"`
 }
 
 // CreateSinglePayment creates a payment in truelayer
