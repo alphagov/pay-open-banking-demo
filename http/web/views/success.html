@@ -18,11 +18,13 @@
         <div class="govuk-panel__body">
           Your reference number is<br><strong>{{ .Payment.Reference }}</strong>
         </div>
-
-        <a id="return-url" role="button" class="govuk-button" href="{{ .Payment.ReturnURL }}">Continue</a>
       </div>
+
+      <a id="return-url" role="button" class="govuk-button" href="{{ .Payment.ReturnURL }}">Continue</a>
     </div>
   </main>
+
+  {{ template "footer.html" }}
 </body>
 
 </html>

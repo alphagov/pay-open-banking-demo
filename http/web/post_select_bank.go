@@ -23,7 +23,7 @@ func PostSelectBankHandler(db *database.DB, truelayerAccessToken string) echo.Ha
 		request := truelayer.SinglePaymentRequest{
 			Amount:                       charge.Amount,
 			Currency:                     "GBP",
-			BeneficiaryName:              "GOV.UK Pay",
+			BeneficiaryName:              "GOV.UK Pay Cake Service",
 			BeneficiaryReference:         "GOV.UK PAY DEMO",
 			BeneficiarySortCode:          "234567",
 			BeneficiaryAccountNumber:     "23456789",
