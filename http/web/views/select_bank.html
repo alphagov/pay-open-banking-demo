@@ -15,21 +15,21 @@
   <main class="govuk-main-wrapper">
     <div class="govuk-width-container">
 
-      <form id="select-provider" name="select-provider" method="POST" action="{{ .Action }}" novalidate>
+      <form id="select-bank" name="select-bank" method="POST" action="{{ .Action }}" novalidate>
         <div class="govuk-form-group">
-          <fieldset class="govuk-fieldset" aria-describedby="select-provider-hint">
+          <fieldset class="govuk-fieldset" aria-describedby="select-bank-hint">
             <legend class="govuk-fieldset__legend govuk-fieldset__legend--xl">
               <h1 class="govuk-fieldset__heading">
                 Pick your bank
               </h1>
             </legend>
-            <span id="select-provider-hint" class="govuk-hint">
+            <span id="select-bank-hint" class="govuk-hint">
               You will be transferred to login to your online banking to complete the payment.
             </span>
             <div class="govuk-radios">
               {{range .Providers}}
               <div class="govuk-radios__item">
-                <input class="govuk-radios__input" id="{{ .ID }}" name="select-provider" type="radio" value="{{ .ID }}">
+                <input class="govuk-radios__input" id="{{ .ID }}" name="select-bank" type="radio" value="{{ .ID }}">
                 <label class="govuk-label govuk-radios__label" for="{{ .ID }}">
                   {{ .DisplayableName }}
                 </label>

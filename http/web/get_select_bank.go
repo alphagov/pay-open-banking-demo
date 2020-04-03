@@ -15,7 +15,7 @@ type SelectProviderData struct {
 	Action    string
 }
 
-func GetSelectProvidersHander(db *database.DB) echo.HandlerFunc {
+func GetSelectBankHander(db *database.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		providers := truelayer.GetProviders().Results
 		charge, err := db.GetCharge(c.Param("payment_id"))
@@ -33,6 +33,6 @@ func GetSelectProvidersHander(db *database.DB) echo.HandlerFunc {
 			Payment:   payment,
 			Action:    fmt.Sprintf("/payment/%s/select_bank", charge.ExternalId),
 		}
-		return c.Render(http.StatusOK, "select_provider.html", data)
+		return c.Render(http.StatusOK, "select_bank.html", data)
 	}
 }
