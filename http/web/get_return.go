@@ -14,12 +14,13 @@ type ReturnData struct {
 
 func GetReturnHandler(db *database.DB, truelayerAccessToken string) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		charge, err := db.GetChargeByProviderId(c.Param("payment_id"))
+		providerID := c.Param("payment_id")
+		charge, err := db.GetChargeByProviderId(providerID)
 		if err != nil {
 			return err
 		}
 
-		response, err := truelayer.GetSinglePaymentInfo(charge.ProviderID, truelayerAccessToken)
+		response, err := truelayer.GetSinglePaymentInfo(providerID, truelayerAccessToken)
 		if err != nil {
 			return err
 		}

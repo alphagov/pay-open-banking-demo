@@ -18,7 +18,6 @@ type Charge struct {
 	Description string `json:"description"`
 	ReturnUrl   string `json:"return_url"`
 	Status      string `json:"status"`
-	ProviderID	string `json:"provider_id"`
 }
 
 type DB struct {
@@ -89,18 +88,18 @@ func (db *DB) InsertCharge(charge Charge) error {
 
 func (db *DB) GetCharge(paymentID string) (Charge, error) {
 	charge := Charge{}
-	err := db.conn.QueryRow(`SELECT external_id, amount, reference, description, return_url, status, provider_id
+	err := db.conn.QueryRow(`SELECT external_id, amount, reference, description, return_url, status
 		FROM charges WHERE external_id = $1`, paymentID).Scan(&charge.ExternalID, &charge.Amount,
-		&charge.Reference, &charge.Description, &charge.ReturnUrl, &charge.Status, &charge.ProviderID)
+		&charge.Reference, &charge.Description, &charge.ReturnUrl, &charge.Status)
 
 	return charge, err
 }
 
 func (db *DB) GetChargeByProviderId(providerID string) (Charge, error) {
 	charge := Charge{}
-	err := db.conn.QueryRow(`SELECT external_id, amount, reference, description, return_url, status, provider_id
+	err := db.conn.QueryRow(`SELECT external_id, amount, reference, description, return_url, status
 		FROM charges WHERE provider_id = $1`, providerID).Scan(&charge.ExternalID, &charge.Amount,
-		&charge.Reference, &charge.Description, &charge.ReturnUrl, &charge.Status, &charge.ProviderID)
+		&charge.Reference, &charge.Description, &charge.ReturnUrl, &charge.Status)
 
 	return charge, err
 }
