@@ -2,6 +2,7 @@ package web
 
 import (
 	"net/http"
+	"os"
 
 	"github.com/alphagov/pay-open-banking-demo/database"
 	"github.com/alphagov/pay-open-banking-demo/internal/truelayer"
@@ -23,7 +24,7 @@ func PostSelectBankHandler(db *database.DB, truelayerAccessToken string) echo.Ha
 			BeneficiarySortCode:          "234567",
 			BeneficiaryAccountNumber:     "23456789",
 			BeneficiaryRemitterReference: "GOV.UK PAY DEMO",
-			RedirectURL:                  "https://console.truelayer-sandbox.com/redirect-page",
+			RedirectURL:                  os.Getenv("APPLICATION_URL") + "/return/",
 			RemitterProviderID:           c.FormValue("select-bank"),
 			DirectBankLink:               true,
 		}
