@@ -16,7 +16,7 @@ func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Con
 	return t.templates.ExecuteTemplate(w, name, data)
 }
 
-func Routes(e *echo.Echo, db *database.DB) {
+func Routes(e *echo.Echo, db *database.DB, truelayerAccessToken string) {
 	t := &Template{
 		templates: template.Must(template.ParseGlob("http/web/views/*.html")),
 	}
@@ -26,4 +26,5 @@ func Routes(e *echo.Echo, db *database.DB) {
 
 	e.GET("/payment/:payment_id/select_method", GetSelectMethodHandler(db))
 	e.GET("/payment/:payment_id/select_bank", GetSelectBankHander(db))
+	e.POST("/payment/:payment_id/select_bank", PostSelectBankHandler(db, truelayerAccessToken))
 }

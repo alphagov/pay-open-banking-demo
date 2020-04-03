@@ -34,7 +34,6 @@ type PaymentStatus struct {
 // SinglePaymentResponse is a wrapper for the results we receive when we receive information about a payment
 type SinglePaymentResponse struct {
 	PaymentResult []PaymentResult `json:"results"`
-	Status        string          `json:"status"`
 }
 
 // ProvidersResponse is the wrapper object we receive from TrueLayer to list banks that are currently available
@@ -67,7 +66,7 @@ type PaymentResult struct {
 	Status                   string `json:"status"`
 }
 
-type singlePaymentRequest struct {
+type SinglePaymentRequest struct {
 	Amount                       int    `json:"amount"`
 	Currency                     string `json:"currency"`
 	BeneficiaryName              string `json:"beneficiary_name"`
@@ -78,48 +77,12 @@ type singlePaymentRequest struct {
 	RedirectURL                  string `json:"redirect_uri"`
 }
 
-func newSinglePaymentRequest(amount int,
-	currency string,
-	beneficiaryName string,
-	beneficiaryReference string,
-	beneficiarySortCode string,
-	beneficiaryAccountNumber string,
-	beneficiaryRemitterReference string,
-	redirectURL string) *singlePaymentRequest {
-	return &singlePaymentRequest{Amount: amount,
-		Currency:                     currency,
-		BeneficiaryName:              beneficiaryName,
-		BeneficiaryReference:         beneficiaryReference,
-		BeneficiarySortCode:          beneficiarySortCode,
-		BeneficiaryAccountNumber:     beneficiaryAccountNumber,
-		BeneficiaryRemitterReference: beneficiaryRemitterReference,
-		RedirectURL:                  redirectURL,
-	}
-}
-
 // CreateSinglePayment creates a payment in truelayer
-func CreateSinglePayment(amount int,
-	currency string,
-	beneficiaryName string,
-	beneficiaryReference string,
-	beneficiarySortCode string,
-	beneficiaryAccountNumber string,
-	beneficiaryRemitterReference string,
-	redirectURL string,
-	accessToken string) SinglePaymentResponse {
-
-	var jsonBody = newSinglePaymentRequest(amount,
-		currency,
-		beneficiaryName,
-		beneficiaryReference,
-		beneficiarySortCode,
-		beneficiarySortCode,
-		beneficiaryRemitterReference,
-		redirectURL)
-
-	marshalled, err := json.Marshal(jsonBody)
+func CreateSinglePayment(request SinglePaymentRequest, accessToken string) (SinglePaymentResponse, error) {
+	paymentResponse := SinglePaymentResponse{}
+	marshalled, err := json.Marshal(request)
 	if err != nil {
-		panic(err)
+		return paymentResponse, err
 	}
 
 	baseTrueLayerPayURL := os.Getenv("TRUELAYER_PAY_URL")
@@ -129,17 +92,16 @@ func CreateSinglePayment(amount int,
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		panic(err)
+		return paymentResponse, err
 	}
 	defer resp.Body.Close()
 
 	body, _ := ioutil.ReadAll(resp.Body)
-	paymentResponse := SinglePaymentResponse{}
 	err = json.Unmarshal(body, &paymentResponse)
 	if err != nil {
-		panic(err)
+		return paymentResponse, err
 	}
-	return paymentResponse
+	return paymentResponse, err
 }
 
 // GetSinglePaymentInfo Gets the information for a single payment by the simpID

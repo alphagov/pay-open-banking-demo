@@ -27,7 +27,7 @@ func Start(config Config) {
 	e.POST("/v1/api/payments", api.CreatePaymentHandler(config.DB))
 	e.GET("/v1/api/payments/:payment_id", api.GetPaymentHandler(config.DB))
 
-	web.Routes(e, config.DB)
+	web.Routes(e, config.DB, truelayerToken.AccessToken)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }
