@@ -12,3 +12,7 @@
 .payment-summary .amount {
   display: block;
 }
+
+.bank-logo {
+  height: 1.5em;
+}

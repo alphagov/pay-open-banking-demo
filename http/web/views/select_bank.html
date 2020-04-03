@@ -30,7 +30,7 @@
                   <div class="govuk-radios__item">
                     <input class="govuk-radios__input" id="{{ .ID }}" name="select-bank" type="radio" value="{{ .ID }}">
                     <label class="govuk-label govuk-radios__label" for="{{ .ID }}">
-                      {{ .DisplayableName }}
+                      <img class="bank-logo" src="{{ .Logo }}" alt="{{ .DisplayableName }}"/>
                     </label>
                   </div>
                   {{else}}
