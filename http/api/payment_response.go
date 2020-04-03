@@ -2,6 +2,7 @@ package api
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/alphagov/pay-open-banking-demo/database"
 )
@@ -21,7 +22,7 @@ func NewPaymentResponse(charge database.Charge) *PaymentResponse {
 		Reference:   charge.Reference,
 		Description: charge.Description,
 		Amount:      charge.Amount,
-		NextURL:     fmt.Sprintf("https://localhost:8080/payment/%s", charge.ExternalID),
+		NextURL:     fmt.Sprintf("%spayment/%s/select_method", os.Getenv("APPLICATION_URL"), charge.ExternalID),
 		Status:      charge.Status,
 	}
 	return &response
