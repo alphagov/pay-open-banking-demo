@@ -17,11 +17,11 @@ type PaymentResponse struct {
 
 func NewPaymentResponse(charge database.Charge) *PaymentResponse {
 	response := PaymentResponse{
-		PaymentID:   charge.ExternalId,
+		PaymentID:   charge.ExternalID,
 		Reference:   charge.Reference,
 		Description: charge.Description,
 		Amount:      charge.Amount,
-		NextURL:     fmt.Sprintf("https://localhost:8080/payment/%s", charge.ExternalId),
+		NextURL:     fmt.Sprintf("https://localhost:8080/payment/%s", charge.ExternalID),
 		Status:      charge.Status,
 	}
 	return &response

@@ -32,6 +32,13 @@ func PostSelectBankHandler(db *database.DB, truelayerAccessToken string) echo.Ha
 		if err != nil {
 			return err
 		}
-		return c.Redirect(http.StatusSeeOther, response.PaymentResult[0].AuthURI)
+		paymentResult := response.PaymentResult[0]
+
+		err = db.UpdateChargeWithProviderID(charge.ExternalID, paymentResult.SimpID, "started")
+		if err != nil {
+			return err
+		}
+
+		return c.Redirect(http.StatusSeeOther, paymentResult.AuthURI)
 	}
 }

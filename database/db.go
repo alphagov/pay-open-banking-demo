@@ -12,7 +12,7 @@ import (
 )
 
 type Charge struct {
-	ExternalId  string `json:"payment_id"`
+	ExternalID  string `json:"payment_id"`
 	Amount      int    `json:"amount"`
 	Reference   string `json:"reference"`
 	Description string `json:"description"`
@@ -68,7 +68,7 @@ func (db *DB) Close() error {
 }
 
 func (db *DB) InsertCharge(charge Charge) error {
-	_, err := db.conn.Exec(`INSERT INTO CHARGES (
+	_, err := db.conn.Exec(`INSERT INTO charges (
 		external_id,
 		amount,
 	  reference,
@@ -76,7 +76,7 @@ func (db *DB) InsertCharge(charge Charge) error {
 		return_url,
 		status) 
 	VALUES ($1, $2, $3, $4, $5, $6)`,
-		charge.ExternalId,
+		charge.ExternalID,
 		charge.Amount,
 		charge.Reference,
 		charge.Description,
@@ -86,11 +86,18 @@ func (db *DB) InsertCharge(charge Charge) error {
 	return err
 }
 
-func (db *DB) GetCharge(paymentId string) (Charge, error) {
+func (db *DB) GetCharge(paymentID string) (Charge, error) {
 	charge := Charge{}
 	err := db.conn.QueryRow(`SELECT external_id, amount, reference, description, return_url, status
-		FROM CHARGES WHERE external_id = $1`, paymentId).Scan(&charge.ExternalId, &charge.Amount,
+		FROM charges WHERE external_id = $1`, paymentID).Scan(&charge.ExternalID, &charge.Amount,
 		&charge.Reference, &charge.Description, &charge.ReturnUrl, &charge.Status)
 
 	return charge, err
+}
+
+func (db *DB) UpdateChargeWithProviderID(paymentID string, providerID string, status string) error {
+	_, err := db.conn.Exec(`UPDATE charges set provider_id = $1, status = $2 WHERE external_id = $3`,
+		providerID, status, paymentID)
+
+	return err
 }

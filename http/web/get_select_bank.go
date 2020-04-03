@@ -31,7 +31,7 @@ func GetSelectBankHander(db *database.DB) echo.HandlerFunc {
 		data := SelectProviderData{
 			Providers: providers,
 			Payment:   payment,
-			Action:    fmt.Sprintf("/payment/%s/select_bank", charge.ExternalId),
+			Action:    fmt.Sprintf("/payment/%s/select_bank", charge.ExternalID),
 		}
 		return c.Render(http.StatusOK, "select_bank.html", data)
 	}
