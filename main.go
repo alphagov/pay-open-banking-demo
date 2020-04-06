@@ -6,6 +6,7 @@ import (
 
 	"github.com/alphagov/pay-open-banking-demo/database"
 	"github.com/alphagov/pay-open-banking-demo/http"
+	"github.com/alphagov/pay-open-banking-demo/internal/truelayer"
 )
 
 func Main() error {
@@ -23,8 +24,18 @@ func Main() error {
 		return err
 	}
 
+	trueLayer, err := truelayer.NewTruelayer(&truelayer.Config{
+		AuthURL:      os.Getenv("TRUELAYER_AUTH_URL"),
+		PayURL:       os.Getenv("TRUELAYER_PAY_URL"),
+		ClientID:     os.Getenv("TRUELAYER_CLIENT_ID"),
+		ClientSecret: os.Getenv("TRUELAYER_CLIENT_SECRET")})
+	if err != nil {
+		return err
+	}
+
 	http.Start(http.Config{
-		DB: db})
+		DB:        db,
+		TrueLayer: trueLayer})
 
 	return nil
 }

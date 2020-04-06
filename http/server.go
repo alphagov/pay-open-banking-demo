@@ -1,8 +1,6 @@
 package http
 
 import (
-	"log"
-	
 	"github.com/alphagov/pay-open-banking-demo/database"
 	"github.com/alphagov/pay-open-banking-demo/http/api"
 	"github.com/alphagov/pay-open-banking-demo/http/web"
@@ -12,7 +10,8 @@ import (
 )
 
 type Config struct {
-	DB *database.DB
+	DB        *database.DB
+	TrueLayer *truelayer.TrueLayer
 }
 
 func Start(config Config) {
@@ -21,16 +20,10 @@ func Start(config Config) {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
-	truelayerToken, err := truelayer.GeneratePaymentToken()
-	if err != nil {
-		panic(e)
-	}
-	log.Printf("Got TrueLayer token, expires in %d", truelayerToken.ExpiresIn)
-
 	e.POST("/v1/api/payments", api.CreatePaymentHandler(config.DB))
 	e.GET("/v1/api/payments/:payment_id", api.GetPaymentHandler(config.DB))
 
-	web.Routes(e, config.DB, truelayerToken.AccessToken)
+	web.Routes(e, config.DB, config.TrueLayer)
 
 	e.Logger.Fatal(e.Start(":8080"))
 }

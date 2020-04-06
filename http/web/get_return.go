@@ -13,7 +13,7 @@ type ReturnData struct {
 	Payment PaymentData
 }
 
-func GetReturnHandler(db *database.DB, truelayerAccessToken string) echo.HandlerFunc {
+func GetReturnHandler(db *database.DB, trueLayer *truelayer.TrueLayer) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		providerID := c.QueryParam("payment_id")
 		log.Print("Getting payment by provider id: " + providerID)
@@ -22,7 +22,7 @@ func GetReturnHandler(db *database.DB, truelayerAccessToken string) echo.Handler
 			return err
 		}
 
-		response, err := truelayer.GetSinglePaymentInfo(providerID, truelayerAccessToken)
+		response, err := trueLayer.GetSinglePaymentInfo(providerID)
 		if err != nil {
 			return err
 		}
