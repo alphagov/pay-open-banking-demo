@@ -29,8 +29,8 @@
                   {{range .Providers}}
                   <div class="govuk-radios__item">
                     <input class="govuk-radios__input" id="{{ .ID }}" name="select-bank" type="radio" value="{{ .ID }}">
-                    <label class="govuk-label govuk-radios__label" for="{{ .ID }}">
-                      <img class="bank-logo" src="{{ .Logo }}" alt="{{ .DisplayableName }}"/>
+                    <label class="govuk-label govuk-radios__label bank-with-logo" for="{{ .ID }}" style="background-image: url({{ .Icon }}); ">
+                      {{ .DisplayableName }}
                     </label>
                   </div>
                   {{else}}

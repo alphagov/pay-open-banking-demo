@@ -15,4 +15,13 @@
 
 .bank-logo {
   height: 1.5em;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.bank-with-logo {
+  background-repeat: no-repeat;
+  background-size: contain;
+  padding-left: 50px;
+  margin-left: 15px;
 }
