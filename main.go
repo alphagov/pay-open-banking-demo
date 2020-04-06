@@ -25,10 +25,13 @@ func Main() error {
 	}
 
 	trueLayer, err := truelayer.NewTruelayer(&truelayer.Config{
-		AuthURL:      os.Getenv("TRUELAYER_AUTH_URL"),
-		PayURL:       os.Getenv("TRUELAYER_PAY_URL"),
-		ClientID:     os.Getenv("TRUELAYER_CLIENT_ID"),
-		ClientSecret: os.Getenv("TRUELAYER_CLIENT_SECRET")})
+		AuthURL:           getEnv("TRUELAYER_AUTH_URL", "https://auth.truelayer-sandbox.com/"),
+		PayURL:            getEnv("TRUELAYER_PAY_URL", "https://pay-api.truelayer-sandbox.com/"),
+		ClientID:          os.Getenv("TRUELAYER_CLIENT_ID"),
+		ClientSecret:      os.Getenv("TRUELAYER_CLIENT_SECRET"),
+		BankAccountNumber: getEnv("BANK_ACCOUNT_NO", "23456789"),
+		BankSortCode:      getEnv("BANK_SORT_CODE", "234567")})
+
 	if err != nil {
 		return err
 	}
@@ -44,4 +47,11 @@ func main() {
 	if err := Main(); err != nil {
 		log.Fatal(err)
 	}
+}
+
+func getEnv(key string, defaultVal string) string {
+	if value, exists := os.LookupEnv(key); exists {
+		return value
+	}
+	return defaultVal
 }

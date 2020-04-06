@@ -1,9 +1,8 @@
 package web
 
 import (
-	"log"
+	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/alphagov/pay-open-banking-demo/database"
 	"github.com/alphagov/pay-open-banking-demo/internal/truelayer"
@@ -17,33 +16,22 @@ func PostSelectBankHandler(db *database.DB, trueLayer *truelayer.TrueLayer) echo
 			return err
 		}
 
-		redirectURL := os.Getenv("APPLICATION_URL") + "return"
-		log.Print("Redirect URL to send to TrueLayer " + redirectURL)
+		// TODO detect whether we're on mobile or desktop if on mobile, create payment
+		// with truelayer and redirect to auth_uri immediately
 
-		request := truelayer.SinglePaymentRequest{
-			Amount:                       charge.Amount,
-			Currency:                     "GBP",
-			BeneficiaryName:              "GOV.UK Pay Cake Service",
-			BeneficiaryReference:         "GOV.UK PAY DEMO",
-			BeneficiarySortCode:          "234567",
-			BeneficiaryAccountNumber:     "23456789",
-			BeneficiaryRemitterReference: "GOV.UK PAY DEMO",
-			RedirectURL:                  redirectURL,
-			RemitterProviderID:           c.FormValue("select-bank"),
-			DirectBankLink:               true,
-		}
+		// redirectURL := os.Getenv("APPLICATION_URL") + "return"
+		// paymentResult, err := CreateTrueLayerPayment(trueLayer, charge, c.FormValue("select-bank"), redirectURL)
+		// if err != nil {
+		// 	return err
+		// }
 
-		response, err := trueLayer.CreateSinglePayment(request)
-		if err != nil {
-			return err
-		}
-		paymentResult := response.PaymentResult[0]
+		// return c.Redirect(http.StatusSeeOther, paymentResult.AuthURI)
 
-		err = db.UpdateChargeWithProviderID(charge.ExternalID, paymentResult.SimpID, "started")
+		err = db.UpdateChargeBank(charge.ExternalID, c.FormValue("select-bank"))
 		if err != nil {
 			return err
 		}
 
-		return c.Redirect(http.StatusSeeOther, paymentResult.AuthURI)
+		return c.Redirect(http.StatusSeeOther, fmt.Sprintf("/payment/%s/continue_to_payment", charge.ExternalID))
 	}
 }

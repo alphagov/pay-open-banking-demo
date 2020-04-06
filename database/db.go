@@ -12,12 +12,14 @@ import (
 )
 
 type Charge struct {
-	ExternalID  string `json:"payment_id"`
-	Amount      int    `json:"amount"`
-	Reference   string `json:"reference"`
-	Description string `json:"description"`
-	ReturnURL   string `json:"return_url"`
-	Status      string `json:"status"`
+	ExternalID  string         `json:"payment_id"`
+	Amount      int            `json:"amount"`
+	Reference   string         `json:"reference"`
+	Description string         `json:"description"`
+	ReturnURL   string         `json:"return_url"`
+	Status      string         `json:"status"`
+	ProviderID  sql.NullString `json:"provider_id"`
+	Bank        sql.NullString `json:"bank"`
 }
 
 type DB struct {
@@ -88,18 +90,22 @@ func (db *DB) InsertCharge(charge Charge) error {
 
 func (db *DB) GetCharge(paymentID string) (Charge, error) {
 	charge := Charge{}
-	err := db.conn.QueryRow(`SELECT external_id, amount, reference, description, return_url, status
+	err := db.conn.QueryRow(`SELECT external_id, amount, reference, description, return_url, status, 
+		provider_id, bank
 		FROM charges WHERE external_id = $1`, paymentID).Scan(&charge.ExternalID, &charge.Amount,
-		&charge.Reference, &charge.Description, &charge.ReturnURL, &charge.Status)
+		&charge.Reference, &charge.Description, &charge.ReturnURL, &charge.Status, &charge.ProviderID,
+		&charge.Bank)
 
 	return charge, err
 }
 
 func (db *DB) GetChargeByProviderId(providerID string) (Charge, error) {
 	charge := Charge{}
-	err := db.conn.QueryRow(`SELECT external_id, amount, reference, description, return_url, status
+	err := db.conn.QueryRow(`SELECT external_id, amount, reference, description, return_url, status,
+	  provider_id, bank
 		FROM charges WHERE provider_id = $1`, providerID).Scan(&charge.ExternalID, &charge.Amount,
-		&charge.Reference, &charge.Description, &charge.ReturnURL, &charge.Status)
+		&charge.Reference, &charge.Description, &charge.ReturnURL, &charge.Status, &charge.ProviderID,
+		&charge.Bank)
 
 	return charge, err
 }
@@ -114,6 +120,13 @@ func (db *DB) UpdateChargeWithProviderID(paymentID string, providerID string, st
 func (db *DB) UpdateChargeStatus(paymentID string, status string) error {
 	_, err := db.conn.Exec(`UPDATE charges set status = $1 WHERE external_id = $2`,
 		status, paymentID)
+
+	return err
+}
+
+func (db *DB) UpdateChargeBank(paymentID string, bank string) error {
+	_, err := db.conn.Exec(`UPDATE charges set bank = $1 WHERE external_id = $2`,
+		bank, paymentID)
 
 	return err
 }

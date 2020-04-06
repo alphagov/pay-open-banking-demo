@@ -28,6 +28,8 @@ func Routes(e *echo.Echo, db *database.DB, trueLayer *truelayer.TrueLayer) {
 	e.GET("/payment/:payment_id/select_method", GetSelectMethodHandler(db))
 	e.GET("/payment/:payment_id/select_bank", GetSelectBankHander(db, trueLayer))
 	e.POST("/payment/:payment_id/select_bank", PostSelectBankHandler(db, trueLayer))
-	e.GET("/payment/:payment_id/continue_to_payment", GetContinueOnMobileHandler(db, trueLayer))
+	e.GET("/payment/:payment_id/continue_to_payment", GetContinueToPaymentHandler(db, trueLayer))
+	e.GET("/payment/:payment_id/redirect_to_bank", GetRedirectToBankHandler(db, trueLayer))
 	e.GET("/return", GetReturnHandler(db, trueLayer))
+	e.GET("/return/back_to_desktop", GetGoBackToDesktopHandler(db, trueLayer))
 }

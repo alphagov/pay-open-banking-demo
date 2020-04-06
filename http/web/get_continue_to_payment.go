@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/alphagov/pay-open-banking-demo/database"
 	"github.com/alphagov/pay-open-banking-demo/internal/truelayer"
@@ -17,7 +18,7 @@ type ContinueOnMobileData struct {
 	ContinueOnDesktopAction string
 }
 
-func GetContinueOnMobileHandler(db *database.DB, trueLayer *truelayer.TrueLayer) echo.HandlerFunc {
+func GetContinueToPaymentHandler(db *database.DB, trueLayer *truelayer.TrueLayer) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		charge, err := db.GetCharge(c.Param("payment_id"))
 		if err != nil {
@@ -25,7 +26,7 @@ func GetContinueOnMobileHandler(db *database.DB, trueLayer *truelayer.TrueLayer)
 		}
 
 		var qr []byte
-		qr, err = qrcode.Encode(fmt.Sprintf("/payment/%s/mobile_redirect", charge.ExternalID), qrcode.Medium, 256)
+		qr, err = qrcode.Encode(fmt.Sprintf("%s/payment/%s/redirect_to_bank?transferredDevice=true", os.Getenv("APPLICATION_URL"), charge.ExternalID), qrcode.Medium, 256)
 		if err != nil {
 			return err
 		}
@@ -34,6 +35,6 @@ func GetContinueOnMobileHandler(db *database.DB, trueLayer *truelayer.TrueLayer)
 		return c.Render(http.StatusOK, "continue_to_payment.html", ContinueOnMobileData{
 			Payment:                 NewPaymentData(charge),
 			QR:                      qrBase46,
-			ContinueOnDesktopAction: fmt.Sprintf("/payment/%s/continue_to_payment", charge.ExternalID)})
+			ContinueOnDesktopAction: fmt.Sprintf("/payment/%s/redirect_to_bank", charge.ExternalID)})
 	}
 }

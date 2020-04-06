@@ -1,0 +1,2 @@
+ALTER TABLE charges
+DROP COLUMN bank;

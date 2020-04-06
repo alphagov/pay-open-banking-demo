@@ -13,10 +13,12 @@ import (
 )
 
 type Config struct {
-	AuthURL      string
-	PayURL       string
-	ClientID     string
-	ClientSecret string
+	AuthURL           string
+	PayURL            string
+	ClientID          string
+	ClientSecret      string
+	BankAccountNumber string
+	BankSortCode      string
 }
 
 // AccessTokenResponse is the response we receive from TrueLayer when we request an access token
@@ -135,7 +137,10 @@ func generatePaymentToken(config *Config) (AccessTokenResponse, error) {
 }
 
 // CreateSinglePayment creates a payment in truelayer
-func (trueLayer *TrueLayer) CreateSinglePayment(request SinglePaymentRequest) (SinglePaymentResponse, error) {
+func (trueLayer *TrueLayer) CreateSinglePayment(request *SinglePaymentRequest) (SinglePaymentResponse, error) {
+	request.BeneficiarySortCode = trueLayer.config.BankSortCode
+	request.BeneficiaryAccountNumber = trueLayer.config.BankAccountNumber
+	
 	paymentResponse := SinglePaymentResponse{}
 	marshalled, err := json.Marshal(request)
 	if err != nil {
