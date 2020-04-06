@@ -26,7 +26,7 @@ func GetContinueToPaymentHandler(db *database.DB, trueLayer *truelayer.TrueLayer
 		}
 
 		var qr []byte
-		qr, err = qrcode.Encode(fmt.Sprintf("%s/payment/%s/redirect_to_bank?transferredDevice=true", os.Getenv("APPLICATION_URL"), charge.ExternalID), qrcode.Medium, 256)
+		qr, err = qrcode.Encode(fmt.Sprintf("%s/payment/%s/redirect_to_bank?transferredDevice=true", os.Getenv("APPLICATION_URL"), charge.ExternalID), qrcode.Medium, 512)
 		if err != nil {
 			return err
 		}
