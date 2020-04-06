@@ -47,6 +47,6 @@ func CreatePaymentHandler(db *database.DB) echo.HandlerFunc {
 		}
 
 		response := NewPaymentResponse(charge)
-		return c.JSON(http.StatusAccepted, response)
+		return c.JSON(http.StatusCreated, response)
 	}
 }
