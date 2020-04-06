@@ -4,6 +4,25 @@
 <head>
   {{ template "head.html" }}
   <title>Continue to payment - GOV.UK Pay</title>
+
+  <script type="text/javascript">
+    function getChargeStatus() {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', '{{ .GetChargeStatusURL }}')
+      xhr.onreadystatechange = function () {
+        console.log(this.status)
+        console.log(this.responseText)
+        if (this.readyState == 4 && this.status == 200) {
+          var json = JSON.parse(this.responseText)
+          if (json.status !== 'created') {
+            window.location.replace("{{ .PaymentInProgressURL }}")
+          }
+        }
+      }
+      xhr.send()
+    }
+    setInterval(getChargeStatus, 1000);
+  </script>
 </head>
 
 <body class="govuk-template__body">
@@ -21,9 +40,9 @@
 
           <img src="data:image/png;base64,{{.QR}}" />
 
-          <p class="govuk-body govuk-!-margin-top-6">Or continue to your bank to make the payment in this browser window</p>
+          <p class="govuk-body govuk-!-margin-top-6">Or continue to your bank to make the payment:</p>
 
-          <a class="govuk-button" data-module="govuk-button" href="{{ .ContinueOnDesktopAction }}">
+          <a class="govuk-button" data-module="govuk-button" href="{{ .ContinueOnDesktopURL }}">
             Continue on desktop
           </a>
         </div>

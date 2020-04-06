@@ -13,9 +13,11 @@ import (
 )
 
 type ContinueOnMobileData struct {
-	Payment                 PaymentData
-	QR                      string
-	ContinueOnDesktopAction string
+	Payment              PaymentData
+	QR                   string
+	ContinueOnDesktopURL string
+	GetChargeStatusURL   string
+	PaymentInProgressURL string
 }
 
 func GetContinueToPaymentHandler(db *database.DB, trueLayer *truelayer.TrueLayer) echo.HandlerFunc {
@@ -33,8 +35,10 @@ func GetContinueToPaymentHandler(db *database.DB, trueLayer *truelayer.TrueLayer
 		qrBase46 := base64.StdEncoding.EncodeToString(qr)
 
 		return c.Render(http.StatusOK, "continue_to_payment.html", ContinueOnMobileData{
-			Payment:                 NewPaymentData(charge),
-			QR:                      qrBase46,
-			ContinueOnDesktopAction: fmt.Sprintf("/payment/%s/redirect_to_bank", charge.ExternalID)})
+			Payment:              NewPaymentData(charge),
+			QR:                   qrBase46,
+			ContinueOnDesktopURL: fmt.Sprintf("/payment/%s/redirect_to_bank", charge.ExternalID),
+			GetChargeStatusURL:   fmt.Sprintf("/payment/%s/status", charge.ExternalID),
+			PaymentInProgressURL: fmt.Sprintf("/payment/%s/in_progress", charge.ExternalID)})
 	}
 }

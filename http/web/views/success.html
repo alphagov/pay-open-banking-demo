@@ -19,6 +19,10 @@
           Your reference number is<br><strong>{{ .Payment.Reference }}</strong>
         </div>
       </div>
+
+      {{ if .ContinueOnDesktop }}
+      <p class="govuk-body">Go back to your desktop browser to continue.</p>
+      {{ end }}
     </div>
   </main>
 

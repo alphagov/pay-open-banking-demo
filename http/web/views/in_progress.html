@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" class="govuk-template">
+
+<head>
+  {{ template "head.html" }}
+  <title>Your payment is in progress - GOV.UK Pay</title>
+
+  <script type="text/javascript">
+    function getChargeStatus() {
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', '{{ .GetChargeStatusURL }}')
+      xhr.onreadystatechange = function () {
+        console.log(this.status)
+        console.log(this.responseText)
+        if (this.readyState == 4 && this.status == 200) {
+          var json = JSON.parse(this.responseText)
+          if (json.status !== 'started') {
+            window.location.replace("{{ .CompleteURL }}")
+          }
+        }
+      }
+      xhr.send()
+    }
+    setInterval(getChargeStatus, 1000);
+  </script>
+</head>
+
+<body class="govuk-template__body">
+  {{ template "header.html" . }}
+
+  <main class="govuk-main-wrapper">
+    <div class="govuk-width-container">
+
+      <div class="govuk-grid-row govuk-!-margin-bottom-9">
+        <div class="govuk-grid-column-two-thirds ">
+
+          <h1 class="govuk-heading-l">Your payment is in progress</h1>
+
+          <p class="govuk-body">Complete the payment on your mobile. This
+            page will automatically refresh when the payment is complete.</p>
+        </div>
+      </div>
+  </main>
+
+  {{ template "footer.html" }}
+</body>
+
+</html>

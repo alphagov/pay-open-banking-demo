@@ -14,7 +14,11 @@
       <h1 class="govuk-heading-l">Your payment was unsuccessful</h1>
       <p class="govuk-body-l">No money has been taken from your account. Contact your bank for more details.</p>
 
+      {{ if .ContinueOnDesktop }}
+      <p class="govuk-body">Go back to your desktop browser to continue.</p>
+      {{ else }}
       <a id="return-url" role="button" class="govuk-button" href="{{ .Payment.ReturnURL }}">Continue</a>
+      {{ end }}
     </div>
   </main>
 
