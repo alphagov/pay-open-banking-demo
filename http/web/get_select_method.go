@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/alphagov/pay-open-banking-demo/database"
-	"github.com/alphagov/pay-open-banking-demo/internal/truelayer"
 	"github.com/labstack/echo/v4"
 )
 
@@ -16,14 +15,12 @@ type SelectMethodData struct {
 
 func GetSelectMethodHandler(db *database.DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		providers := truelayer.GetProviders().Results
 		charge, err := db.GetCharge(c.Param("payment_id"))
 		if err != nil {
 			return err
 		}
 
-		data := SelectProviderData{
-			Providers: providers,
+		data := SelectMethodData{
 			Payment:   NewPaymentData(charge),
 			Action:    fmt.Sprintf("/payment/%s/select_bank", charge.ExternalID),
 		}

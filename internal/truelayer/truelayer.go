@@ -8,10 +8,16 @@ import (
 	"log"
 	"net/http"
 	"net/url"
-	"os"
 	"strconv"
 	"strings"
 )
+
+type Config struct {
+	AuthURL      string
+	PayURL       string
+	ClientID     string
+	ClientSecret string
+}
 
 // AccessTokenResponse is the response we receive from TrueLayer when we request an access token
 type AccessTokenResponse struct {
@@ -81,17 +87,63 @@ type SinglePaymentRequest struct {
 	DirectBankLink               bool   `json:"direct_bank_link"`
 }
 
+type TrueLayer struct {
+	config *Config
+	token  AccessTokenResponse
+}
+
+func NewTruelayer(config *Config) (*TrueLayer, error) {
+	token, err := generatePaymentToken(config)
+	if err != nil {
+		return nil, err
+	}
+
+	return &TrueLayer{config: config, token: token}, nil
+}
+
+// GeneratePaymentToken Generates a token and stores it in the environment variables
+func generatePaymentToken(config *Config) (AccessTokenResponse, error) {
+	data := url.Values{}
+	data.Set("client_id", config.ClientID)
+	data.Set("client_secret", config.ClientSecret)
+	data.Set("scope", "payments")
+	data.Set("grant_type", "client_credentials")
+
+	accessTokenResponse := AccessTokenResponse{}
+	req, err := http.NewRequest("POST", config.AuthURL+"/connect/token", strings.NewReader(data.Encode()))
+	if err != nil {
+		return accessTokenResponse, err
+	}
+
+	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return accessTokenResponse, err
+	}
+	defer resp.Body.Close()
+
+	body, _ := ioutil.ReadAll(resp.Body)
+	err = json.Unmarshal(body, &accessTokenResponse)
+	if err != nil {
+		return accessTokenResponse, err
+	}
+
+	log.Printf("Got TrueLayer token, expires in %d", accessTokenResponse.ExpiresIn)
+	return accessTokenResponse, err
+}
+
 // CreateSinglePayment creates a payment in truelayer
-func CreateSinglePayment(request SinglePaymentRequest, accessToken string) (SinglePaymentResponse, error) {
+func (trueLayer *TrueLayer) CreateSinglePayment(request SinglePaymentRequest) (SinglePaymentResponse, error) {
 	paymentResponse := SinglePaymentResponse{}
 	marshalled, err := json.Marshal(request)
 	if err != nil {
 		return paymentResponse, err
 	}
 
-	baseTrueLayerPayURL := os.Getenv("TRUELAYER_PAY_URL")
-	req, err := http.NewRequest("POST", baseTrueLayerPayURL+"/single-immediate-payments", bytes.NewBuffer(marshalled))
-	req.Header.Set("Authorization", "Bearer "+accessToken)
+	req, err := http.NewRequest("POST", trueLayer.config.PayURL+"/single-immediate-payments", bytes.NewBuffer(marshalled))
+	req.Header.Set("Authorization", "Bearer "+trueLayer.token.AccessToken)
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -123,15 +175,14 @@ func CreateSinglePayment(request SinglePaymentRequest, accessToken string) (Sing
 }
 
 // GetSinglePaymentInfo Gets the information for a single payment by the simpID
-func GetSinglePaymentInfo(simpID string, accessToken string) (SinglePaymentResponse, error) {
-	baseTrueLayerPayURL := os.Getenv("TRUELAYER_PAY_URL")
+func (trueLayer *TrueLayer) GetSinglePaymentInfo(simpID string) (SinglePaymentResponse, error) {
 	paymentResponse := SinglePaymentResponse{}
-	req, err := http.NewRequest("GET", baseTrueLayerPayURL+"/single-immediate-payments/"+simpID, nil)
+	req, err := http.NewRequest("GET", trueLayer.config.PayURL+"/single-immediate-payments/"+simpID, nil)
 	if err != nil {
 		return paymentResponse, err
 	}
 
-	req.Header.Set("Authorization", "Bearer "+accessToken)
+	req.Header.Set("Authorization", "Bearer "+trueLayer.token.AccessToken)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -148,16 +199,15 @@ func GetSinglePaymentInfo(simpID string, accessToken string) (SinglePaymentRespo
 }
 
 // GetSinglePaymentStatuses Gets the statuses for a single simpID and returns them
-func GetSinglePaymentStatuses(simpID string, accessToken string) (PaymentStatusesResponse, error) {
-	baseTrueLayerPayURL := os.Getenv("TRUELAYER_PAY_URL")
+func (trueLayer *TrueLayer) GetSinglePaymentStatuses(simpID string) (PaymentStatusesResponse, error) {
 	paymentStatuses := PaymentStatusesResponse{}
 
-	req, err := http.NewRequest("GET", baseTrueLayerPayURL+"/single-immediate-payments/"+simpID+"/statuses", nil)
+	req, err := http.NewRequest("GET", trueLayer.config.PayURL+"/single-immediate-payments/"+simpID+"/statuses", nil)
 	if err != nil {
 		return paymentStatuses, err
 	}
 
-	req.Header.Set("Authorization", "Bearer "+accessToken)
+	req.Header.Set("Authorization", "Bearer "+trueLayer.token.AccessToken)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -173,49 +223,9 @@ func GetSinglePaymentStatuses(simpID string, accessToken string) (PaymentStatuse
 	return paymentStatuses, err
 }
 
-// GeneratePaymentToken Generates a token and stores it in the environment variables
-func GeneratePaymentToken() (AccessTokenResponse, error) {
-	baseTrueLayerAuthURL := os.Getenv("TRUELAYER_AUTH_URL")
-
-	clientID := os.Getenv("TRUELAYER_CLIENT_ID")
-	clientSecret := os.Getenv("TRUELAYER_CLIENT_SECRET")
-
-	data := url.Values{}
-	data.Set("client_id", clientID)
-	data.Set("client_secret", clientSecret)
-	data.Set("scope", "payments")
-	data.Set("grant_type", "client_credentials")
-
-	accessTokenResponse := AccessTokenResponse{}
-
-	req, err := http.NewRequest("POST", baseTrueLayerAuthURL+"/connect/token", strings.NewReader(data.Encode()))
-	if err != nil {
-		return accessTokenResponse, err
-	}
-
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
-	req.Header.Add("Content-Length", strconv.Itoa(len(data.Encode())))
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		return accessTokenResponse, err
-	}
-	defer resp.Body.Close()
-
-	body, _ := ioutil.ReadAll(resp.Body)
-	err = json.Unmarshal(body, &accessTokenResponse)
-	if err != nil {
-		return accessTokenResponse, err
-	}
-
-	return accessTokenResponse, err
-}
-
 // GetProviders requests a list of providers from TrueLayer that can currently proccess a SingleImmediatePayment
-func GetProviders() ProvidersResponse {
-	baseTrueLayerPayURL := os.Getenv("TRUELAYER_PAY_URL")
-
-	req, err := http.NewRequest("GET", baseTrueLayerPayURL+"/providers?capability=SingleImmediatePayment", nil)
+func (trueLayer *TrueLayer) GetProviders() ProvidersResponse {
+	req, err := http.NewRequest("GET", trueLayer.config.PayURL+"/providers?capability=SingleImmediatePayment", nil)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {

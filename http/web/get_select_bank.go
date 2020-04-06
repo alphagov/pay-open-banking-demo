@@ -15,9 +15,9 @@ type SelectProviderData struct {
 	Action    string
 }
 
-func GetSelectBankHander(db *database.DB) echo.HandlerFunc {
+func GetSelectBankHander(db *database.DB, trueLayer *truelayer.TrueLayer) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		providers := truelayer.GetProviders().Results
+		providers := trueLayer.GetProviders().Results
 		charge, err := db.GetCharge(c.Param("payment_id"))
 		if err != nil {
 			return err

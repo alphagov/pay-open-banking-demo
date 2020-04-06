@@ -10,7 +10,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-func PostSelectBankHandler(db *database.DB, truelayerAccessToken string) echo.HandlerFunc {
+func PostSelectBankHandler(db *database.DB, trueLayer *truelayer.TrueLayer) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		charge, err := db.GetCharge(c.Param("payment_id"))
 		if err != nil {
@@ -33,7 +33,7 @@ func PostSelectBankHandler(db *database.DB, truelayerAccessToken string) echo.Ha
 			DirectBankLink:               true,
 		}
 
-		response, err := truelayer.CreateSinglePayment(request, truelayerAccessToken)
+		response, err := trueLayer.CreateSinglePayment(request)
 		if err != nil {
 			return err
 		}
