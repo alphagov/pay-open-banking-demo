@@ -140,7 +140,7 @@ func generatePaymentToken(config *Config) (AccessTokenResponse, error) {
 func (trueLayer *TrueLayer) CreateSinglePayment(request *SinglePaymentRequest) (SinglePaymentResponse, error) {
 	request.BeneficiarySortCode = trueLayer.config.BankSortCode
 	request.BeneficiaryAccountNumber = trueLayer.config.BankAccountNumber
-	
+
 	paymentResponse := SinglePaymentResponse{}
 	marshalled, err := json.Marshal(request)
 	if err != nil {
@@ -157,6 +157,8 @@ func (trueLayer *TrueLayer) CreateSinglePayment(request *SinglePaymentRequest) (
 		return paymentResponse, err
 	}
 	defer resp.Body.Close()
+
+	log.Printf("Made truelayer request, status code was %d", resp.StatusCode)
 
 	if resp.StatusCode != 200 {
 		var data map[string]interface{}
