@@ -8,4 +8,5 @@ require (
 	github.com/labstack/echo v3.3.10+incompatible
 	github.com/labstack/echo/v4 v4.1.16
 	github.com/lib/pq v1.3.0
+	github.com/skip2/go-qrcode v0.0.0-20191027152451-9434209cb086
 )

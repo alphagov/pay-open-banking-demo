@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" class="govuk-template">
+
+<head>
+  {{ template "head.html" }}
+  <title>Continue to payment - GOV.UK Pay</title>
+</head>
+
+<body class="govuk-template__body">
+  {{ template "header.html" . }}
+
+  <main class="govuk-main-wrapper">
+    <div class="govuk-width-container">
+
+      <div class="govuk-grid-row govuk-!-margin-bottom-9">
+        <div class="govuk-grid-column-two-thirds ">
+
+          <h2 class="govuk-heading-m">Pay faster with mobile app</h2>
+
+          <p class="govuk-body">Use your phone's camera app to scan the code</p>
+
+          <img src="data:image/png;base64,{{.QR}}" />
+
+          <h2 class="govuk-heading-m govuk-!-margin-top-4">Or continue on desktop</h2>
+
+          <a class="govuk-button" data-module="govuk-button" href="{{ .ContinueOnDesktopAction }}">
+            Continue on desktop
+          </a>
+        </div>
+
+        <div class="govuk-grid-column-one-third payment-summary-wrap">
+          <aside class="payment-summary">
+            <h2 class="govuk-heading-m">Payment summary</h2>
+            <p id="payment-description" class="govuk-body">
+              {{ .Payment.Description }}
+            </p>
+            <p class="govuk-body govuk-!-margin-bottom-0">
+              Total amount:
+              <span id="amount" class="amount govuk-!-font-size-36 govuk-!-font-weight-bold">
+                £{{ .Payment.AmountInPence }}
+              </span>
+            </p>
+          </aside>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  {{ template "footer.html" }}
+</body>
+
+</html>

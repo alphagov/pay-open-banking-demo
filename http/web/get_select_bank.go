@@ -23,11 +23,9 @@ func GetSelectBankHander(db *database.DB, trueLayer *truelayer.TrueLayer) echo.H
 			return err
 		}
 
-		data := SelectProviderData{
+		return c.Render(http.StatusOK, "select_bank.html", SelectProviderData{
 			Providers: providers,
 			Payment:   NewPaymentData(charge),
-			Action:    fmt.Sprintf("/payment/%s/select_bank", charge.ExternalID),
-		}
-		return c.Render(http.StatusOK, "select_bank.html", data)
+			Action:    fmt.Sprintf("/payment/%s/select_bank", charge.ExternalID)})
 	}
 }

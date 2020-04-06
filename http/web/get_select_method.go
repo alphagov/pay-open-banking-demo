@@ -20,10 +20,8 @@ func GetSelectMethodHandler(db *database.DB) echo.HandlerFunc {
 			return err
 		}
 
-		data := SelectMethodData{
-			Payment:   NewPaymentData(charge),
-			Action:    fmt.Sprintf("/payment/%s/select_bank", charge.ExternalID),
-		}
-		return c.Render(http.StatusOK, "select_method.html", data)
+		return c.Render(http.StatusOK, "select_method.html", SelectMethodData{
+			Payment: NewPaymentData(charge),
+			Action:  fmt.Sprintf("/payment/%s/select_bank", charge.ExternalID)})
 	}
 }
