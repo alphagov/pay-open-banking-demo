@@ -1,0 +1,15 @@
+---
+applications:
+  - name: pay-open-banking-demo-live
+    memory: 64M
+    stack: cflinuxfs3
+    disk_quota: 100M
+    instances: 1
+    buildpack: go_buildpack
+    command: ./bin/pay-open-banking-demo
+
+    env:
+      GOVERSION: go1.13
+      TRUELAYER_PAY_URL: https://pay-api.truelayer.com/
+      TRUELAYER_AUTH_URL: https://auth.truelayer.com/
+      APPLICATION_URL: https://pay-open-banking-demo-live.cloudapps.digital/
