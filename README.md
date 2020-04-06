@@ -15,7 +15,7 @@ Playing around with creating an open banking demo in Go
 
 | variable                | description                                 |
 |:------------------------|:--------------------------------------------|
-| APPLICATION URL         | the base URL of the application             |
+| APPLICATION_URL         | the base URL of the application             |
 | DATABASE_URL            | the connection URL for the database         |
 | TRUELAYER_PAY_URL       | the URL of the TrueLayer Pay API            |
 | TRUELAYER_AUTH_URL      | the URL of the TrueLayer Auth API           |
