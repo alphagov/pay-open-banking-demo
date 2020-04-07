@@ -9,7 +9,7 @@
     var continueClicked = false
 
     function getChargeStatus() {
-      var xhr = new XMLHttpRequest();
+      var xhr = new XMLHttpRequest()
       xhr.open('GET', '{{ .GetChargeStatusURL }}')
       xhr.onreadystatechange = function () {
         if (!continueClicked && this.readyState == 4 && this.status == 200) {
@@ -23,9 +23,9 @@
     }
     setInterval(getChargeStatus, 2000);
 
-    document.getElementById("continue-on-desktop").addEventListener("click", function(event){
+    document.getElementById("continue-on-desktop").addEventListener("click", function(){
       continueClicked = true
-    }
+    })
   </script>
 </head>
 
