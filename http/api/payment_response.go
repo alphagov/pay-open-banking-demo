@@ -22,7 +22,7 @@ func NewPaymentResponse(charge database.Charge) *PaymentResponse {
 		Reference:   charge.Reference,
 		Description: charge.Description,
 		Amount:      charge.Amount,
-		NextURL:     fmt.Sprintf("%spayment/%s/select_method", os.Getenv("APPLICATION_URL"), charge.ExternalID),
+		NextURL:     fmt.Sprintf("%s/payment/%s/select_method", os.Getenv("APPLICATION_URL"), charge.ExternalID),
 		Status:      charge.Status,
 	}
 	return &response

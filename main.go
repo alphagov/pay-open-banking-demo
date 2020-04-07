@@ -25,8 +25,8 @@ func Main() error {
 	}
 
 	trueLayer, err := truelayer.NewTruelayer(&truelayer.Config{
-		AuthURL:           getEnv("TRUELAYER_AUTH_URL", "https://auth.truelayer-sandbox.com/"),
-		PayURL:            getEnv("TRUELAYER_PAY_URL", "https://pay-api.truelayer-sandbox.com/"),
+		AuthURL:           getEnv("TRUELAYER_AUTH_URL", "https://auth.truelayer-sandbox.com"),
+		PayURL:            getEnv("TRUELAYER_PAY_URL", "https://pay-api.truelayer-sandbox.com"),
 		ClientID:          os.Getenv("TRUELAYER_CLIENT_ID"),
 		ClientSecret:      os.Getenv("TRUELAYER_CLIENT_SECRET"),
 		BankAccountNumber: getEnv("BANK_ACCOUNT_NO", "23456789"),

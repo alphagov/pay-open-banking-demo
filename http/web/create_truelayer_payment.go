@@ -17,8 +17,8 @@ func CreateTrueLayerPayment(db *database.DB, trueLayer *truelayer.TrueLayer, cha
 		RedirectURL:                  redirectURL,
 		RemitterProviderID:           bank,
 		DirectBankLink:               true,
-		Icon:                         os.Getenv("APPLICATION_URL") + "assets/images/govuk-mask-icon.svg",
-		Logo:                         os.Getenv("APPLICATION_URL") + "assets/images/govuk-mask-icon.svg"}
+		Icon:                         os.Getenv("APPLICATION_URL") + "/assets/images/govuk-mask-icon.svg",
+		Logo:                         os.Getenv("APPLICATION_URL") + "/assets/images/govuk-mask-icon.svg"}
 
 	paymentResult := truelayer.PaymentResult{}
 	response, err := trueLayer.CreateSinglePayment(request)

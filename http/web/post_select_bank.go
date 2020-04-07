@@ -19,7 +19,7 @@ func PostSelectBankHandler(db *database.DB, trueLayer *truelayer.TrueLayer) echo
 		// TODO detect whether we're on mobile or desktop if on mobile, create payment
 		// with truelayer and redirect to auth_uri immediately
 
-		// redirectURL := os.Getenv("APPLICATION_URL") + "return"
+		// redirectURL := os.Getenv("APPLICATION_URL") + "/return"
 		// paymentResult, err := CreateTrueLayerPayment(trueLayer, charge, c.FormValue("select-bank"), redirectURL)
 		// if err != nil {
 		// 	return err

@@ -9,7 +9,7 @@ Playing around with creating an open banking demo in Go
 
 ```docker run -d -p 5432:5432 --name openbanking -e POSTGRES_PASSWORD=mysupersecretpassword postgres```
 
-```APPLICATION_URL=http://localhost:8080/ DATABASE_URL=postgres://postgres:mysupersecretpassword@localhost:5432/?sslmode=disable TRUELAYER_PAY_URL=https://pay-api.truelayer-sandbox.com/ TRUELAYER_AUTH_URL=https://auth.truelayer-sandbox.com/ TRUELAYER_CLIENT_ID=xxx TRUELAYER_CLIENT_SECRET=xxx ./pay-open-banking-demo```
+```APPLICATION_URL=http://localhost:8080 DATABASE_URL=postgres://postgres:mysupersecretpassword@localhost:5432/?sslmode=disable TRUELAYER_PAY_URL=https://pay-api.truelayer-sandbox.com TRUELAYER_AUTH_URL=https://auth.truelayer-sandbox.com TRUELAYER_CLIENT_ID=xxx TRUELAYER_CLIENT_SECRET=xxx ./pay-open-banking-demo```
 
 ## Environment variables
 

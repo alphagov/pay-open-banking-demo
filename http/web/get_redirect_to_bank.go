@@ -19,9 +19,9 @@ func GetRedirectToBankHandler(db *database.DB, trueLayer *truelayer.TrueLayer) e
 		transferredDevice := c.QueryParam("transferredDevice")
 		var redirectURL string
 		if transferredDevice == "true" {
-			redirectURL = os.Getenv("APPLICATION_URL") + "return/back_to_desktop"
+			redirectURL = os.Getenv("APPLICATION_URL") + "/return/back_to_desktop"
 		} else {
-			redirectURL = os.Getenv("APPLICATION_URL") + "return"
+			redirectURL = os.Getenv("APPLICATION_URL") + "/return"
 		}
 
 		paymentResult, err := CreateTrueLayerPayment(db, trueLayer, charge, charge.Bank.String, redirectURL)
