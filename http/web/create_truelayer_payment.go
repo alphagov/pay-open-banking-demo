@@ -1,6 +1,8 @@
 package web
 
 import (
+	"os"
+
 	"github.com/alphagov/pay-open-banking-demo/database"
 	"github.com/alphagov/pay-open-banking-demo/internal/truelayer"
 )
@@ -15,7 +17,8 @@ func CreateTrueLayerPayment(db *database.DB, trueLayer *truelayer.TrueLayer, cha
 		RedirectURL:                  redirectURL,
 		RemitterProviderID:           bank,
 		DirectBankLink:               true,
-	}
+		Icon:                         os.Getenv("APPLICATION_URL") + "assets/images/govuk-mask-icon.svg",
+		Logo:                         os.Getenv("APPLICATION_URL") + "assets/images/govuk-mask-icon.svg"}
 
 	paymentResult := truelayer.PaymentResult{}
 	response, err := trueLayer.CreateSinglePayment(request)

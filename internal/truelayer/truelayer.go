@@ -87,6 +87,8 @@ type SinglePaymentRequest struct {
 	RedirectURL                  string `json:"redirect_uri"`
 	RemitterProviderID           string `json:"remitter_provider_id"`
 	DirectBankLink               bool   `json:"direct_bank_link"`
+	Icon                         string `json:"icon"`
+	Logo                         string `json:"logo"`
 }
 
 type TrueLayer struct {
