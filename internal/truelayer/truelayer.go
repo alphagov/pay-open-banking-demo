@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Config struct {
@@ -91,9 +92,14 @@ type SinglePaymentRequest struct {
 	Logo                         string `json:"logo"`
 }
 
+type AccessToken struct {
+	Token   string
+	Expires time.Time
+}
+
 type TrueLayer struct {
 	config *Config
-	token  AccessTokenResponse
+	token  AccessToken
 }
 
 func NewTruelayer(config *Config) (*TrueLayer, error) {
@@ -106,17 +112,17 @@ func NewTruelayer(config *Config) (*TrueLayer, error) {
 }
 
 // GeneratePaymentToken Generates a token and stores it in the environment variables
-func generatePaymentToken(config *Config) (AccessTokenResponse, error) {
+func generatePaymentToken(config *Config) (AccessToken, error) {
 	data := url.Values{}
 	data.Set("client_id", config.ClientID)
 	data.Set("client_secret", config.ClientSecret)
 	data.Set("scope", "payments")
 	data.Set("grant_type", "client_credentials")
 
-	accessTokenResponse := AccessTokenResponse{}
+	accessToken := AccessToken{}
 	req, err := http.NewRequest("POST", config.AuthURL+"/connect/token", strings.NewReader(data.Encode()))
 	if err != nil {
-		return accessTokenResponse, err
+		return accessToken, err
 	}
 
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
@@ -124,18 +130,37 @@ func generatePaymentToken(config *Config) (AccessTokenResponse, error) {
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		return accessTokenResponse, err
+		return accessToken, err
 	}
 	defer resp.Body.Close()
 
+	response := AccessTokenResponse{}
 	body, _ := ioutil.ReadAll(resp.Body)
-	err = json.Unmarshal(body, &accessTokenResponse)
+	err = json.Unmarshal(body, &response)
 	if err != nil {
-		return accessTokenResponse, err
+		return accessToken, err
 	}
 
-	log.Printf("Got TrueLayer token, expires in %d", accessTokenResponse.ExpiresIn)
-	return accessTokenResponse, err
+	accessToken = AccessToken{
+		Token: response.AccessToken,
+		// expire 1 min before token actually expires for safety
+		Expires: time.Now().Add(time.Second * time.Duration(response.ExpiresIn - 60)),
+	}
+
+	log.Printf("Got TrueLayer token, expires at %s", accessToken.Expires.String())
+
+	return accessToken, err
+}
+
+func (trueLayer *TrueLayer) getNewAccessTokenIfRequired() error {
+	if time.Now().After(trueLayer.token.Expires) {
+		accessToken, err := generatePaymentToken(trueLayer.config)
+		if err != nil {
+			return err
+		}
+		trueLayer.token = accessToken
+	}
+	return nil
 }
 
 // CreateSinglePayment creates a payment in truelayer
@@ -144,13 +169,19 @@ func (trueLayer *TrueLayer) CreateSinglePayment(request *SinglePaymentRequest) (
 	request.BeneficiaryAccountNumber = trueLayer.config.BankAccountNumber
 
 	paymentResponse := SinglePaymentResponse{}
-	marshalled, err := json.Marshal(request)
+	err := trueLayer.getNewAccessTokenIfRequired()
 	if err != nil {
 		return paymentResponse, err
 	}
 
+	marshalled, err := json.Marshal(request)
+	if err != nil {
+		return paymentResponse, err
+	}
+	log.Println("Create payment request: " + string(marshalled))
+	
 	req, err := http.NewRequest("POST", trueLayer.config.PayURL+"/single-immediate-payments", bytes.NewBuffer(marshalled))
-	req.Header.Set("Authorization", "Bearer "+trueLayer.token.AccessToken)
+	req.Header.Set("Authorization", "Bearer "+trueLayer.token.Token)
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -186,12 +217,17 @@ func (trueLayer *TrueLayer) CreateSinglePayment(request *SinglePaymentRequest) (
 // GetSinglePaymentInfo Gets the information for a single payment by the simpID
 func (trueLayer *TrueLayer) GetSinglePaymentInfo(simpID string) (SinglePaymentResponse, error) {
 	paymentResponse := SinglePaymentResponse{}
+	err := trueLayer.getNewAccessTokenIfRequired()
+	if err != nil {
+		return paymentResponse, err
+	}
+
 	req, err := http.NewRequest("GET", trueLayer.config.PayURL+"/single-immediate-payments/"+simpID, nil)
 	if err != nil {
 		return paymentResponse, err
 	}
 
-	req.Header.Set("Authorization", "Bearer "+trueLayer.token.AccessToken)
+	req.Header.Set("Authorization", "Bearer "+trueLayer.token.Token)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
@@ -210,13 +246,17 @@ func (trueLayer *TrueLayer) GetSinglePaymentInfo(simpID string) (SinglePaymentRe
 // GetSinglePaymentStatuses Gets the statuses for a single simpID and returns them
 func (trueLayer *TrueLayer) GetSinglePaymentStatuses(simpID string) (PaymentStatusesResponse, error) {
 	paymentStatuses := PaymentStatusesResponse{}
+	err := trueLayer.getNewAccessTokenIfRequired()
+	if err != nil {
+		return paymentStatuses, err
+	}
 
 	req, err := http.NewRequest("GET", trueLayer.config.PayURL+"/single-immediate-payments/"+simpID+"/statuses", nil)
 	if err != nil {
 		return paymentStatuses, err
 	}
 
-	req.Header.Set("Authorization", "Bearer "+trueLayer.token.AccessToken)
+	req.Header.Set("Authorization", "Bearer "+trueLayer.token.Token)
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
