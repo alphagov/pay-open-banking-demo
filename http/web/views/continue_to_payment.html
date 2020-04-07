@@ -6,13 +6,13 @@
   <title>Continue to payment - GOV.UK Pay</title>
 
   <script type="text/javascript">
+    var continueClicked = false
+
     function getChargeStatus() {
       var xhr = new XMLHttpRequest();
       xhr.open('GET', '{{ .GetChargeStatusURL }}')
       xhr.onreadystatechange = function () {
-        console.log(this.status)
-        console.log(this.responseText)
-        if (this.readyState == 4 && this.status == 200) {
+        if (!continueClicked && this.readyState == 4 && this.status == 200) {
           var json = JSON.parse(this.responseText)
           if (json.status !== 'created') {
             window.location.replace("{{ .PaymentInProgressURL }}")
@@ -21,7 +21,11 @@
       }
       xhr.send()
     }
-    setInterval(getChargeStatus, 1000);
+    setInterval(getChargeStatus, 2000);
+
+    document.getElementById("continue-on-desktop").addEventListener("click", function(event){
+      continueClicked = true
+    }
   </script>
 </head>
 
@@ -42,7 +46,7 @@
 
           <p class="govuk-body govuk-!-margin-top-6">Or continue to your bank to make the payment:</p>
 
-          <a class="govuk-button" data-module="govuk-button" href="{{ .ContinueOnDesktopURL }}">
+          <a class="govuk-button" id="continue-on-desktop" data-module="govuk-button" href="{{ .ContinueOnDesktopURL }}">
             Continue on desktop
           </a>
         </div>
