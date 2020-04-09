@@ -14,7 +14,7 @@
         console.log(this.responseText)
         if (this.readyState == 4 && this.status == 200) {
           var json = JSON.parse(this.responseText)
-          if (json.status !== 'started') {
+          if (json.status !== 'started_on_mobile') {
             window.location.replace("{{ .CompleteURL }}")
           }
         }

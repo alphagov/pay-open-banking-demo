@@ -6,15 +6,13 @@
   <title>Continue to payment - GOV.UK Pay</title>
 
   <script type="text/javascript">
-    var continueClicked = false
-
     function getChargeStatus() {
       var xhr = new XMLHttpRequest()
       xhr.open('GET', '{{ .GetChargeStatusURL }}')
       xhr.onreadystatechange = function () {
-        if (!continueClicked && this.readyState == 4 && this.status == 200) {
+        if (this.readyState == 4 && this.status == 200) {
           var json = JSON.parse(this.responseText)
-          if (json.status !== 'created') {
+          if (json.status === 'started_on_mobile') {
             window.location.replace("{{ .PaymentInProgressURL }}")
           }
         }
@@ -22,10 +20,6 @@
       xhr.send()
     }
     setInterval(getChargeStatus, 2000);
-
-    document.getElementById("continue-on-desktop").addEventListener("click", function(){
-      continueClicked = true
-    })
   </script>
 </head>
 

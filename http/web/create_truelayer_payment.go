@@ -7,7 +7,7 @@ import (
 	"github.com/alphagov/pay-open-banking-demo/internal/truelayer"
 )
 
-func CreateTrueLayerPayment(db *database.DB, trueLayer *truelayer.TrueLayer, charge database.Charge, bank string, redirectURL string) (truelayer.PaymentResult, error) {
+func CreateTrueLayerPayment(db *database.DB, trueLayer *truelayer.TrueLayer, charge database.Charge, bank string, redirectURL string, status string) (truelayer.PaymentResult, error) {
 	request := &truelayer.SinglePaymentRequest{
 		Amount:                       charge.Amount,
 		Currency:                     "GBP",
@@ -27,7 +27,7 @@ func CreateTrueLayerPayment(db *database.DB, trueLayer *truelayer.TrueLayer, cha
 	}
 	paymentResult = response.PaymentResult[0]
 
-	err = db.UpdateChargeWithProviderID(charge.ExternalID, paymentResult.SimpID, "started")
+	err = db.UpdateChargeWithProviderID(charge.ExternalID, paymentResult.SimpID, status)
 	if err != nil {
 		return paymentResult, err
 	}
