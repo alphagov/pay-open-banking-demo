@@ -1,4 +1,7 @@
 # pay-open-banking-demo
+
+> As of July 2024 this repository is no longer actively maintained by the GOV.UK Pay team.
+
 Playing around with creating an open banking demo in Go
 
 
